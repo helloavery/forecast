@@ -1,0 +1,8 @@
+.DS_Store
+file.sh
+out/
+*.class
+logs/
+/target/
+*/target/
+.idea/
