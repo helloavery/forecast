@@ -11,9 +11,9 @@ package com.itavery.forecast.service.verification;
 
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.verification.VerificationDAO;
-import com.itavery.forecast.external.EmailValidationResponse;
 import com.itavery.forecast.external.MailgunEmailVerification;
 import com.itavery.forecast.service.audit.AuditService;
+import com.mashape.unirest.http.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -64,10 +64,12 @@ public class VerificationServiceImpl implements VerificationService{
                 LOGGER.error("Email could not be found for token {}", token);
                 throw new NullPointerException("");
             }
-            EmailValidationResponse emailValidationResponse = mailgunEmailVerification.validateEmail(email);
-            if(!emailValidationResponse.isDisposableAddress() && emailValidationResponse.isValid()){
+            JsonNode emailValidationResponse = mailgunEmailVerification.validateEmail(email);
+            boolean isDisposableAddress = (boolean) emailValidationResponse.getObject().get("is_disposable_address");
+            boolean isValid = (boolean) emailValidationResponse.getObject().get("is_valid");
+            if(!isDisposableAddress && isValid){
                 verificationDAO.updateAccountStatus(email);
-                auditService.createAudit("", AuditType.EMAIL_VERIFIED, null);
+                auditService.createAudit(email, AuditType.EMAIL_VERIFIED, null);
             }
             else{
                 LOGGER.info("E-mail address {} is not valid", email);

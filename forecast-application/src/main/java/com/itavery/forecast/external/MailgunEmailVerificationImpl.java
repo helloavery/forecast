@@ -1,8 +1,7 @@
 package com.itavery.forecast.external;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.bootconfig.ProgramArguments;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -13,20 +12,24 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
 
     private static final Logger LOGGER = LogManager.getLogger(MailgunEmailVerificationImpl.class);
 
+    private final ProgramArguments programArguments;
+
+    public MailgunEmailVerificationImpl(final ProgramArguments programArguments){
+        this.programArguments = programArguments;
+    }
+
     @Override
-    public EmailValidationResponse validateEmail(String email) throws Exception {
+    public JsonNode validateEmail(String email) throws Exception {
         try{
-            Gson gson = new GsonBuilder().create();
             HttpResponse<JsonNode> request = Unirest.get(ForecastConstants.MAILGUN_MAILBOX_VERIFICATION_URL)
-                    .basicAuth("api", ForecastConstants.MAILGUN_PUBLIC_API_KEY)
+                    .basicAuth("api", programArguments.getMailgunPrivateKey())
                     .queryString("address", email)
                     .asJson();
-            EmailValidationResponse emailValidationResponse = gson.fromJson(request.getBody().getObject().toString(), EmailValidationResponse.class);
-            if(emailValidationResponse == null){
+            if(request == null){
                 LOGGER.error("Error retrieving email validation response for e-mail {}", email);
                 throw new RuntimeException("Error retrieving email validation response");
             }
-            return emailValidationResponse;
+            return request.getBody();
 
         }
         catch(Exception e){

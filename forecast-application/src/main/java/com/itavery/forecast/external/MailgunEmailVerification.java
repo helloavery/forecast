@@ -10,7 +10,9 @@ package com.itavery.forecast.external;
  *===========================================================================*/
 
 
+import com.mashape.unirest.http.JsonNode;
+
 public interface MailgunEmailVerification {
 
-    EmailValidationResponse validateEmail(String email) throws Exception;
+    JsonNode validateEmail(String email) throws Exception;
 }

@@ -17,6 +17,8 @@ public class ProgramArguments {
     private String hibernateDdlAuto;
     private String showSql = "true";
     private String sessionContextClass = "thread";
+    private String mailgunPublicKey;
+    private String mailgunPrivateKey;
     private String filename;
     private String environment;
 
@@ -66,6 +68,22 @@ public class ProgramArguments {
 
     public void setSessionContextClass(String sessionContextClass) {
         this.sessionContextClass = sessionContextClass;
+    }
+
+    public String getMailgunPublicKey() {
+        return mailgunPublicKey;
+    }
+
+    public void setMailgunPublicKey(String mailgunPublicKey) {
+        this.mailgunPublicKey = mailgunPublicKey;
+    }
+
+    public String getMailgunPrivateKey() {
+        return mailgunPrivateKey;
+    }
+
+    public void setMailgunPrivateKey(String mailgunPrivateKey) {
+        this.mailgunPrivateKey = mailgunPrivateKey;
     }
 
     public String getFilename() {

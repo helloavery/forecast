@@ -29,7 +29,7 @@ public class ForecastLauncher implements ApplicationRunner {
 
     private static final Logger LOGGER = LogManager.getLogger(ForecastLauncher.class);
 
-    private final List<String> startupParams = Arrays.asList("datasource", "schema", "filename", "hibernateDdlAuto", "environment");
+    private final List<String> startupParams = Arrays.asList("datasource", "schema", "mailgunPublicKey", "mailgunPrivateKey", "filename", "hibernateDdlAuto", "environment");
 
     public static void main(String[] args) {
         SpringApplication.run(ForecastLauncher.class, args);

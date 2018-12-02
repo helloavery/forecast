@@ -26,12 +26,11 @@ import com.itavery.forecast.mithra.user.UsersDB;
 import com.itavery.forecast.mithra.user.UsersDBFinder;
 import com.itavery.forecast.regions.Regions;
 import com.itavery.forecast.user.AccountStatusType;
-import com.itavery.forecast.user.ActiveAndVerified;
+import com.itavery.forecast.BooleanToIntAdaptor;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.RoleValues;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.user.UserDTO;
-import com.itavery.forecast.user.VerificationStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -64,9 +63,9 @@ public class UserDAOImpl implements UserDAO {
             userToBeRegisteredCredentials.setPassword(bCryptPasswordEncoder.encode(registrationDTO.getPassword()));
             userToBeRegisteredCredentials.setCreatedDate(new Timestamp(new Date().getTime()));
             userToBeRegisteredCredentials.setTimesModified(1);
-            userToBeRegisteredAccountStatus.setEmailVerified(VerificationStatus.NOT_VERIFIED.getCode());
+            userToBeRegisteredAccountStatus.setEmailVerified(BooleanToIntAdaptor.FALSE.getValue());
             userToBeRegisteredAccountStatus.setStatus(AccountStatusType.ACTIVE.getCode());
-            userToBeRegisteredAccountStatus.setActiveAndVerified(ActiveAndVerified.FALSE.getValue());
+            userToBeRegisteredAccountStatus.setActiveAndVerified(BooleanToIntAdaptor.FALSE.getValue());
             RolesDBList defaultRoleList = RolesDBFinder.findMany(RolesDBFinder.role().eq(RoleValues.USER.getUserRoleValue()));
             RolesDB defaultRole = RolesDBFinder.findOne(RolesDBFinder.role().eq(RoleValues.USER.getUserRoleValue()));
             userToBeRegistered.setFirstName(registrationDTO.getFirstName());
@@ -186,7 +185,7 @@ public class UserDAOImpl implements UserDAO {
             AccountStatusDB accountStatusDB = fetchAccountStatusByUserId(userId);
             if (accountStatusDB != null) {
                 accountStatusDB.setStatus(AccountStatusType.DEACTIVATED.getCode());
-                accountStatusDB.setActiveAndVerified(ActiveAndVerified.FALSE.getValue());
+                accountStatusDB.setActiveAndVerified(BooleanToIntAdaptor.FALSE.getValue());
             }
             returnMessage = OperationResult.USER_SUCCESSFUL_DEACTIVATION.getMessage();
         } catch (DAOException e) {

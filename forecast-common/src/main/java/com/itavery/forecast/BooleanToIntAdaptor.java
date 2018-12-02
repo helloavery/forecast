@@ -1,4 +1,4 @@
-package com.itavery.forecast.user;
+package com.itavery.forecast;
 
 /*=============================================================================
  |                Forecaster V1.0
@@ -9,14 +9,14 @@ package com.itavery.forecast.user;
  |
  *===========================================================================*/
 
-public enum ActiveAndVerified {
+public enum BooleanToIntAdaptor {
 
     TRUE(1),
     FALSE(0);
 
     private final int value;
 
-    ActiveAndVerified(int value) {
+    BooleanToIntAdaptor(int value) {
         this.value = value;
     }
 

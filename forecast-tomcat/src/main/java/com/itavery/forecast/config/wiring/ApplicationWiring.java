@@ -141,6 +141,6 @@ public class ApplicationWiring {
     }
     @Bean
     MailgunEmailVerification mailgunEmailVerification() {
-        return new MailgunEmailVerificationImpl();
+        return new MailgunEmailVerificationImpl(programArguments);
     }
 }

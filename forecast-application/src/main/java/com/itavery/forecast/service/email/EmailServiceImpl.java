@@ -77,7 +77,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             Configuration configuration = new Configuration()
                     .domain(ForecastConstants.MAILGUN_DOMAIN_NAME)
-                    .apiKey(ForecastConstants.MAILGUN_PUBLIC_API_KEY)
+                    .apiKey(programArguments.getMailgunPrivateKey())
                     .from("Do-Not-Reply", "donotreply@forecaster.itavery.com");
             Mail.using(configuration)
                     .to(emailAddress)
