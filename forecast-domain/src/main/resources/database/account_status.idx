@@ -1,2 +1,0 @@
-alter table account_status add constraint account_status_pk primary key (user_id, out_date);
-

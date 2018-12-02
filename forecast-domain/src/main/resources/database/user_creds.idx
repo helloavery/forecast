@@ -1,2 +1,0 @@
-alter table user_creds add constraint user_creds_pk primary key (user_id, modified_date);
-

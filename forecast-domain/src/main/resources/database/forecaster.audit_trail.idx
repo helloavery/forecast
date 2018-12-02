@@ -1,2 +1,0 @@
-alter table forecaster.audit_trail add constraint forecaster.audit_trail_pk primary key (audit_id);
-

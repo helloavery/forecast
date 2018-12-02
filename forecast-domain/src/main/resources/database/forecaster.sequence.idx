@@ -1,2 +1,0 @@
-alter table forecaster.sequence add constraint forecaster.sequence_pk primary key (sequence_name);
-

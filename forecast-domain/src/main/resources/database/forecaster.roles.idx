@@ -1,2 +1,0 @@
-alter table forecaster.roles add constraint forecaster.roles_pk primary key (role_id);
-

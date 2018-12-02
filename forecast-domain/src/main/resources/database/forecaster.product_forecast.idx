@@ -1,5 +1,0 @@
-alter table forecaster.product_forecast add constraint forecaster.product_forecast_pk primary key (product_forecast_id, user_id, out_date);
-
-drop index if exists forecaster.product_forecast_idx0;
-create index forecaster.product_forecast_idx0 on forecaster.product_forecast(user_id, out_date);
-

@@ -8,3 +8,4 @@ logs/
 .idea/
 *.ddl
 *.idx
+*.fk

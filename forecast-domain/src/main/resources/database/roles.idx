@@ -1,2 +1,0 @@
-alter table roles add constraint roles_pk primary key (role_id);
-

@@ -1,5 +1,0 @@
-alter table forecaster.email_token add constraint forecaster.email_token_pk primary key (email, out_date);
-
-drop index if exists forecaster.email_token_idx0;
-create unique index forecaster.email_token_idx0 on forecaster.email_token(token, out_date);
-

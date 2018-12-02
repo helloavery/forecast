@@ -1,8 +1,0 @@
-alter table user_roles add constraint user_roles_pk primary key (user_id, role_id, out_date);
-
-drop index if exists user_roles_idx0;
-create index user_roles_idx0 on user_roles(user_id, out_date);
-
-drop index if exists user_roles_idx1;
-create index user_roles_idx1 on user_roles(role_id, out_date);
-

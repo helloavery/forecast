@@ -1,2 +1,0 @@
-alter table forecaster.instance_environments add constraint forecaster.instance_environments_pk primary key (environment_key);
-
