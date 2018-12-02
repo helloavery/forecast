@@ -1,0 +1,5 @@
+alter table product_forecast add constraint product_forecast_pk primary key (product_forecast_id, user_id, out_date);
+
+drop index if exists product_forecast_idx0;
+create index product_forecast_idx0 on product_forecast(user_id, out_date);
+

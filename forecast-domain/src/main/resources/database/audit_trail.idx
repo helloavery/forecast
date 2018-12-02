@@ -1,0 +1,2 @@
+alter table audit_trail add constraint audit_trail_pk primary key (audit_id);
+

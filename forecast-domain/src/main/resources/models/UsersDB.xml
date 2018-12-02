@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.user</PackageName>
+    <ClassName>UsersDB</ClassName>
+    <DefaultTable>forecaster.users</DefaultTable>
+
+    <AsOfAttribute name="processingDate"
+                   infinityDate="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   defaultIfNotSpecified="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   fromColumnName="in_date"
+                   toColumnName="out_date"
+                   isProcessingDate="true"
+                   toIsInclusive="false"/>
+
+    <Attribute name="userId" javaType="int" columnName="user_id" primaryKey="true"
+               primaryKeyGeneratorStrategy="SimulatedSequence">
+        <SimulatedSequence sequenceName="UsersSequence"
+                           sequenceObjectFactoryName="com.itavery.forecast.mithra.SequenceFactory"
+                           hasSourceAttribute="false"
+                           batchSize="1"
+                           initialValue="1"
+                           incrementSize="1"/>
+    </Attribute>
+    <Attribute name="firstName" javaType="String" columnName="first_name" nullable="false" maxLength="36"/>
+    <Attribute name="lastName" javaType="String" columnName="last_name" nullable="false" maxLength="36"/>
+    <Attribute name="username" javaType="String" columnName="username" nullable="false" maxLength="255"/>
+    <Attribute name="email" javaType="String" columnName="email" nullable="false" maxLength="255"/>
+    <Attribute name="countryCode" javaType="String" columnName="country_code" nullable="false" maxLength="9"/>
+    <Attribute name="phoneNumber" javaType="String" columnName="phone_number" nullable="false" maxLength="12"/>
+    <Attribute name="region" javaType="String" columnName="region" nullable="false" maxLength="24"/>
+
+    <Relationship name="accountStatus" relatedObject="AccountStatusDB" cardinality="one-to-one"
+                  reverseRelationshipName="accountStatuses" relatedIsDependent="true">
+        this.userId = AccountStatusDB.userId
+    </Relationship>
+
+    <Relationship name="userCredentials" relatedObject="UserCredsDB" cardinality="one-to-one"
+                  reverseRelationshipName="userCredentials" relatedIsDependent="true">
+        this.userId = UserCredsDB.userId
+    </Relationship>
+
+    <Relationship name="roles" relatedObject="RolesDB" cardinality="many-to-many" reverseRelationshipName="roles">
+        UserRolesDB.userId = this.userId and RolesDB.roleId = UserRolesDB.roleId
+    </Relationship>
+
+    <Relationship name="demandEntries" relatedObject="ProductDemandDB" cardinality="one-to-many"
+                  reverseRelationshipName="users" relatedIsDependent="true">
+        this.userId = ProductDemandDB.userId
+    </Relationship>
+
+    <Relationship name="forecastEntries" relatedObject="ProductForecastDB" cardinality="one-to-many"
+                  reverseRelationshipName="users" relatedIsDependent="true">
+        this.userId = ProductForecastDB.userId
+    </Relationship>
+
+    <Relationship name="emailTokens" relatedObject="EmailTokenDB" cardinality="one-to-one"
+                  reverseRelationshipName="tokens" relatedIsDependent="false">
+        this.email = EmailTokenDB.email
+    </Relationship>
+
+    <Index name="users_index0" unique="true">userId,email,username</Index>
+    <Index name="users_index1" unique="true">username</Index>
+    <Index name="users_index2" unique="true">email</Index>
+
+
+</MithraObject>

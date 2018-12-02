@@ -1,0 +1,11 @@
+alter table forecaster.users add constraint forecaster.users_pk primary key (user_id, out_date);
+
+drop index if exists forecaster.users_idx0;
+create unique index forecaster.users_idx0 on forecaster.users(user_id, email, username, out_date);
+
+drop index if exists forecaster.users_idx1;
+create unique index forecaster.users_idx1 on forecaster.users(username, out_date);
+
+drop index if exists forecaster.users_idx2;
+create unique index forecaster.users_idx2 on forecaster.users(email, out_date);
+

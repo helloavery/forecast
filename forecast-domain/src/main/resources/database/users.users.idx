@@ -1,0 +1,11 @@
+alter table users.users add constraint users.users_pk primary key (user_id, out_date);
+
+drop index if exists users.users_idx0;
+create unique index users.users_idx0 on users.users(user_id, email, username, out_date);
+
+drop index if exists users.users_idx1;
+create unique index users.users_idx1 on users.users(username, out_date);
+
+drop index if exists users.users_idx2;
+create unique index users.users_idx2 on users.users(email, out_date);
+

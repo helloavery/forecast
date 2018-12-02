@@ -1,0 +1,2 @@
+alter table forecaster.user_creds add constraint forecaster.user_creds_pk primary key (user_id);
+

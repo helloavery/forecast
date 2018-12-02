@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.organization</PackageName>
+    <ClassName>InstanceEnvironmentsDB</ClassName>
+    <DefaultTable>forecaster.instance_environments</DefaultTable>
+
+    <Attribute name="environmentKey" javaType="String" columnName="environment_key" maxLength="50" primaryKey="true"/>
+    <Attribute name="environmentURL" javaType="String" columnName="environment_url" maxLength="50" nullable="false"/>
+</MithraObject>

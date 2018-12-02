@@ -1,0 +1,29 @@
+spring.thymeleaf.enabled: false
+
+#spring.datasource.validationQuery: SELECT 1
+
+#spring.jpa.hibernate.naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+
+# ==============================================================
+# = Spring Security / Queries for AuthenticationManagerBuilder
+# ==============================================================
+spring.queries.users-query: select u.email, cre.password, u.active from users.users u inner join users.user_cred cre on(u.user_id=cre.user_id) where u.email=?
+spring.queries.credentials-query: select u.email, cre.password, a.active_and_verified from users.users u inner join users.user_cred cre on(u.user_id=cre.user_id) inner join users.account_status a on(u.user_id=a.user_id) where u.email=?
+spring.queries.roles-query: select u.email, r.role from users.users u inner join users.user_roles ur on(u.user_id=ur.user_id) inner join users.roles r on(ur.role_id=r.role_id) where u.email=?
+# spring.queries.verified-query: select email, password, account_verified from users where email=?
+
+zuul:
+  routes:
+    resource:
+      path: /resource/**
+      url: http://localhost:8080
+
+spring.main.allow-bean-definition-overriding: true
+
+logging.level.com.forecast.itavery: INFO
+logging.level.org.hibernate: ERROR
+logging.level.org.postgres: ERROR
+logging.file: logs/forecaster-log.log
+
+

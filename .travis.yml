@@ -1,0 +1,21 @@
+# sonarqube setup
+language: java
+dist: trusty
+sudo: false
+install: true
+addons:
+  sonarcloud:
+    organization: "helloavery-github"
+    token:
+      secure: "7f83333b4611cd2032335e9a501edc7fb8f7d115"
+  #script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+#  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+jdk:
+- oraclejdk8
+script:
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+cache:
+  directories:
+  - '$HOME/.m2/repository'
+  - '$HOME/.sonar/cache'

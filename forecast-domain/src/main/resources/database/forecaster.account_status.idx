@@ -1,0 +1,2 @@
+alter table forecaster.account_status add constraint forecaster.account_status_pk primary key (user_id, out_date);
+

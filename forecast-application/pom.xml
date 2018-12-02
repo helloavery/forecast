@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <groupId>com.itavery.forecast</groupId>
+        <artifactId>forecast</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>forecast-application</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.itavery.forecast</groupId>
+            <artifactId>forecast-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itavery.forecast</groupId>
+            <artifactId>forecast-domain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itavery.forecast</groupId>
+            <artifactId>forecast-dto</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sargue</groupId>
+            <artifactId>mailgun</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+    </dependencies>
+</project>

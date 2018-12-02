@@ -1,0 +1,7 @@
+alter table forecaster.ser_roles add constraint forecaster.ser_roles_fk_0 foreign key (
+    role_id
+)
+references forecaster.roles(
+    role_id
+);
+

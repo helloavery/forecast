@@ -1,0 +1,8 @@
+alter table forecaster.ser_roles add constraint forecaster.ser_roles_pk primary key (user_id, role_id, out_date);
+
+drop index if exists forecaster.ser_roles_idx0;
+create index forecaster.ser_roles_idx0 on forecaster.ser_roles(role_id, out_date);
+
+drop index if exists forecaster.ser_roles_idx1;
+create index forecaster.ser_roles_idx1 on forecaster.ser_roles(user_id, out_date);
+

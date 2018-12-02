@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.user</PackageName>
+    <ClassName>EmailTokenDB</ClassName>
+    <DefaultTable>forecaster.email_token</DefaultTable>
+
+    <AsOfAttribute name="processingDate"
+                   infinityDate="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   defaultIfNotSpecified="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   fromColumnName="in_date"
+                   toColumnName="out_date"
+                   isProcessingDate="true"
+                   toIsInclusive="false"/>
+
+    <Attribute name="email" javaType="String" columnName="email" maxLength="255" primaryKey="true"/>
+    <Attribute name="token" javaType="String" columnName="token" maxLength="255" nullable="false"/>
+
+    <Index name="email_token_index0" unique="true">token</Index>
+
+</MithraObject>

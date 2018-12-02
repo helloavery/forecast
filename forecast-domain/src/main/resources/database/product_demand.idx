@@ -1,0 +1,5 @@
+alter table product_demand add constraint product_demand_pk primary key (product_demand_id, user_id, out_date);
+
+drop index if exists product_demand_idx0;
+create index product_demand_idx0 on product_demand(user_id, out_date);
+

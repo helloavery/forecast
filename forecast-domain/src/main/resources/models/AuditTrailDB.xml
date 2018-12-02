@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.user</PackageName>
+    <ClassName>AuditTrailDB</ClassName>
+    <DefaultTable>forecaster.audit_trail</DefaultTable>
+
+    <Attribute name="auditId" javaType="int" columnName="audit_id" primaryKey="true"
+               primaryKeyGeneratorStrategy="SimulatedSequence">
+        <SimulatedSequence sequenceName="AuditTrailSequence"
+                           sequenceObjectFactoryName="com.itavery.forecast.mithra.SequenceFactory"
+                           hasSourceAttribute="false"
+                           batchSize="1"
+                           initialValue="1"
+                           incrementSize="1"/>
+    </Attribute>
+    <Attribute name="auditAction" javaType="String" columnName="audit_action" nullable="false" maxLength="45"/>
+    <Attribute name="auditDescription" javaType="String" columnName="audit_description" nullable="false"
+               maxLength="255"/>
+    <Attribute name="actionedBy" javaType="String" columnName="actioned_by" nullable="false" maxLength="30"/>
+    <Attribute name="dateActioned" javaType="Timestamp" columnName="date_actioned" nullable="false"/>
+</MithraObject>

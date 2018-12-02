@@ -1,0 +1,2 @@
+alter table users.sequence add constraint users.sequence_pk primary key (sequence_name);
+

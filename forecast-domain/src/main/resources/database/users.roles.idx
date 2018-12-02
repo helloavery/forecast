@@ -1,0 +1,2 @@
+alter table users.roles add constraint users.roles_pk primary key (role_id);
+

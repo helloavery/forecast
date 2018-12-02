@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.user</PackageName>
+    <ClassName>AccountStatusDB</ClassName>
+    <DefaultTable>forecaster.account_status</DefaultTable>
+
+    <AsOfAttribute name="processingDate"
+                   infinityDate="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   defaultIfNotSpecified="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   fromColumnName="in_date"
+                   toColumnName="out_date"
+                   isProcessingDate="true"
+                   toIsInclusive="false"/>
+
+    <Attribute name="status" javaType="char" columnName="status" nullable="false"/>
+    <Attribute name="emailVerified" javaType="char" columnName="email_verified" nullable="false"/>
+    <Attribute name="userId" javaType="int" columnName="user_id" primaryKey="true"/>
+    <Attribute name="activeAndVerified" javaType="int" columnName="active_and_verified" nullable="false"/>
+</MithraObject>

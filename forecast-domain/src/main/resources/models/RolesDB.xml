@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.mithra.organization</PackageName>
+    <ClassName>RolesDB</ClassName>
+    <DefaultTable>forecaster.roles</DefaultTable>
+
+
+    <Attribute name="roleId" javaType="int" columnName="role_id" primaryKey="true"
+               primaryKeyGeneratorStrategy="SimulatedSequence">
+        <SimulatedSequence sequenceName="RoleSequence"
+                           sequenceObjectFactoryName="com.itavery.forecast.mithra.SequenceFactory"
+                           hasSourceAttribute="false"
+                           batchSize="1"
+                           initialValue="1"
+                           incrementSize="1"/>
+    </Attribute>
+
+    <Attribute name="role" javaType="char" columnName="role" nullable="false"/>
+
+</MithraObject>

@@ -1,0 +1,18 @@
+<MithraRuntime>
+    <ConnectionManager className="com.itavery.forecast.mithra.ForecastConnectionConfig">
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.AccountStatusDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.AuditTrailDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.product.AuditTrailProductDB"
+                                   cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.EmailTokenDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.organization.InstanceEnvironmentsDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.product.ProductDemandDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.product.ProductForecastDB"
+                                   cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.organization.RolesDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.sequence.SequenceDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UserCredsDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UserRolesDB" cacheType="partial"/>
+        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UsersDB" cacheType="partial"/>
+    </ConnectionManager>
+</MithraRuntime>
