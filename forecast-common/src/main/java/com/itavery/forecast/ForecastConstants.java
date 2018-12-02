@@ -21,6 +21,6 @@ public class ForecastConstants {
     public static final String USERID_PREFIX = "USERID: ";
     public static final String COOKIE_USER_ID = "Id";
     public static final String COOKIE_USERNAME = "username";
-    public static final String MAILGUN_API_KEY = "key-4efc86f22f79a780c2192839496e6d7d";
+    public static final String MAILGUN_PUBLIC_API_KEY = "pubkey-e1683ef19e3afa6dbf7e34e88a853748";
     public static final String MAILGUN_DOMAIN_NAME = "forecast.itavery.com";
 }

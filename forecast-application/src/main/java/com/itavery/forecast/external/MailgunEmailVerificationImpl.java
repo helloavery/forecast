@@ -18,7 +18,7 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
         try{
             Gson gson = new GsonBuilder().create();
             HttpResponse<JsonNode> request = Unirest.get(ForecastConstants.MAILGUN_MAILBOX_VERIFICATION_URL)
-                    .basicAuth("api", ForecastConstants.MAILGUN_API_KEY)
+                    .basicAuth("api", ForecastConstants.MAILGUN_PUBLIC_API_KEY)
                     .queryString("address", email)
                     .asJson();
             EmailValidationResponse emailValidationResponse = gson.fromJson(request.getBody().getObject().toString(), EmailValidationResponse.class);
