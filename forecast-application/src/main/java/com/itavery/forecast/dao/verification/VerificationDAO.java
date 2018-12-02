@@ -18,6 +18,5 @@ public interface VerificationDAO {
     String retrieveEmail(String token);
 
     String updateAccountStatus(String email) throws DAOException;
-
-    //This is a comment
+    
 }
