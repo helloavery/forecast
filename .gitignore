@@ -6,3 +6,5 @@ logs/
 /target/
 */target/
 .idea/
+*.ddl
+*.idx
