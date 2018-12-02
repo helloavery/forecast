@@ -9,3 +9,4 @@ logs/
 *.ddl
 *.idx
 *.fk
+*/resources/database
