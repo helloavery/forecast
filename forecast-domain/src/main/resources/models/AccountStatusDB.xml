@@ -17,7 +17,7 @@
                    toIsInclusive="false"/>
 
     <Attribute name="status" javaType="char" columnName="status" nullable="false"/>
-    <Attribute name="emailVerified" javaType="int" columnName="email_verified" nullable="false"/>
+    <Attribute name="emailVerified" javaType="boolean" columnName="email_verified" nullable="false"/>
     <Attribute name="userId" javaType="int" columnName="user_id" primaryKey="true"/>
-    <Attribute name="activeAndVerified" javaType="int" columnName="active_and_verified" nullable="false"/>
+    <Attribute name="activeAndVerified" javaType="boolean" columnName="active_and_verified" nullable="false"/>
 </MithraObject>

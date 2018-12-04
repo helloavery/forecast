@@ -26,7 +26,6 @@ import com.itavery.forecast.mithra.user.UsersDB;
 import com.itavery.forecast.mithra.user.UsersDBFinder;
 import com.itavery.forecast.regions.Regions;
 import com.itavery.forecast.user.AccountStatusType;
-import com.itavery.forecast.BooleanToIntAdaptor;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.RoleValues;
 import com.itavery.forecast.user.User;
@@ -63,9 +62,9 @@ public class UserDAOImpl implements UserDAO {
             userToBeRegisteredCredentials.setPassword(bCryptPasswordEncoder.encode(registrationDTO.getPassword()));
             userToBeRegisteredCredentials.setCreatedDate(new Timestamp(new Date().getTime()));
             userToBeRegisteredCredentials.setTimesModified(1);
-            userToBeRegisteredAccountStatus.setEmailVerified(BooleanToIntAdaptor.FALSE.getValue());
+            userToBeRegisteredAccountStatus.setEmailVerified(false);
             userToBeRegisteredAccountStatus.setStatus(AccountStatusType.ACTIVE.getCode());
-            userToBeRegisteredAccountStatus.setActiveAndVerified(BooleanToIntAdaptor.FALSE.getValue());
+            userToBeRegisteredAccountStatus.setActiveAndVerified(false);
             RolesDBList defaultRoleList = RolesDBFinder.findMany(RolesDBFinder.role().eq(RoleValues.USER.getUserRoleValue()));
             RolesDB defaultRole = RolesDBFinder.findOne(RolesDBFinder.role().eq(RoleValues.USER.getUserRoleValue()));
             userToBeRegistered.setFirstName(registrationDTO.getFirstName());
@@ -185,7 +184,7 @@ public class UserDAOImpl implements UserDAO {
             AccountStatusDB accountStatusDB = fetchAccountStatusByUserId(userId);
             if (accountStatusDB != null) {
                 accountStatusDB.setStatus(AccountStatusType.DEACTIVATED.getCode());
-                accountStatusDB.setActiveAndVerified(BooleanToIntAdaptor.FALSE.getValue());
+                accountStatusDB.setActiveAndVerified(false);
             }
             returnMessage = OperationResult.USER_SUCCESSFUL_DEACTIVATION.getMessage();
         } catch (DAOException e) {

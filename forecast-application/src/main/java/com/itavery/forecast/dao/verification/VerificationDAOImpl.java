@@ -17,7 +17,6 @@ import com.itavery.forecast.mithra.user.AccountStatusDBFinder;
 import com.itavery.forecast.mithra.user.EmailTokenDB;
 import com.itavery.forecast.mithra.user.EmailTokenDBFinder;
 import com.itavery.forecast.user.AccountStatusType;
-import com.itavery.forecast.BooleanToIntAdaptor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,8 +66,8 @@ public class VerificationDAOImpl implements VerificationDAO {
             if (accountStatusDB != null) {
                 Character status = accountStatusDB.getStatus();
                 if (status.equals(AccountStatusType.ACTIVE.getCode())) {
-                    accountStatusDB.setEmailVerified(BooleanToIntAdaptor.TRUE.getValue());
-                    accountStatusDB.setActiveAndVerified(BooleanToIntAdaptor.TRUE.getValue());
+                    accountStatusDB.setEmailVerified(true);
+                    accountStatusDB.setActiveAndVerified(true);
                     returnMessage = OperationResult.VERIFICATION_EMAIL_VERIFICATION_SUCCESSFUL.getMessage();
                 }
             } else {
