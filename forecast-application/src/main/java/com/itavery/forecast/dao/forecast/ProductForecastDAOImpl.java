@@ -20,16 +20,20 @@ import com.itavery.forecast.product.ProductForecast;
 import com.itavery.forecast.product.ProductForecastDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class ProductForecastDAOImpl implements ProductForecastDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductForecastDAOImpl.class);
 
     private ForecastAssembler forecastAssembler;
 
+    @Inject
     public ProductForecastDAOImpl(ForecastAssembler forecastAssembler) {
         this.forecastAssembler = forecastAssembler;
     }

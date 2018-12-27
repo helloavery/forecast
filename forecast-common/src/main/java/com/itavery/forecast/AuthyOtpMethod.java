@@ -1,17 +1,15 @@
-package com.itavery.forecast.credentials;
+package com.itavery.forecast;
  
  /*=============================================================================
  |                Forecaster V1.0
  |
  |       File created by: Avery Grimes-Farrow
  |
- |       Created On:  8/25/18            
+ |       Created On:  2018-12-10            
  |            
  *===========================================================================*/
 
-public interface CredentialObtainer {
+public enum AuthyOtpMethod {
 
-    String getKey();
-
-    String getValue();
+    SMS, VOICE
 }

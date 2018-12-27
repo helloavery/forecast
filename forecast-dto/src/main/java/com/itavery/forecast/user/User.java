@@ -16,6 +16,7 @@ import java.util.Objects;
 public class User implements Serializable {
 
     private Integer userId;
+    private Integer authyId;
     private String firstName;
     private String lastName;
     private String username;
@@ -30,6 +31,14 @@ public class User implements Serializable {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public Integer getAuthyId() {
+        return authyId;
+    }
+
+    public void setAuthyId(Integer authyId) {
+        this.authyId = authyId;
     }
 
     public String getFirstName() {

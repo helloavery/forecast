@@ -1,9 +1,11 @@
 package com.itavery.forecast;
 
 import com.itavery.forecast.service.user.UserService;
+import com.itavery.forecast.user.LoginDTO;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.User;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.itavery.forecast.user.UserDTO;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,50 +14,59 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import java.security.Principal;
+import java.util.Base64;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("v1/users")
+@CrossOrigin
 public class UserResource {
 
     private final UserService userService;
-    private final BCryptPasswordEncoder encoder;
     private Provider provider;
 
-    public UserResource(UserService userService, BCryptPasswordEncoder encoder, Provider provider) {
+    public UserResource(UserService userService, Provider provider) {
         this.userService = userService;
-        this.encoder = encoder;
         this.provider = provider;
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public Response createUser(@RequestBody RegistrationDTO registrationDTO) {
-        return Response.ok(userService.createUser(registrationDTO)).build();
+    public UserDTO createUser(@Context HttpServletRequest request, @RequestBody RegistrationDTO registrationDTO) {
+        return userService.createUser(request, registrationDTO);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public boolean login(@Context HttpServletRequest request, @RequestBody LoginDTO user){
+        return userService.login(request, user);
+    }
+
+
+    @RequestMapping(value = "/verify/token", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public boolean verifyOtp(@Context HttpServletRequest request, @RequestBody String token){
+        return userService.verifyOtp(request, token);
+    }
+
+    @RequestMapping("/user")
+    public Principal user(HttpServletRequest request) {
+        String authToken = request.getHeader("Authorization").substring("Basic".length()).trim();
+        return () ->  new String(Base64.getDecoder().decode(authToken)).split(":")[0];
     }
 
 
     @RequestMapping(value = "/{userId}/details", method = RequestMethod.GET, produces = "application/json")
-    public Response getUser(@PathVariable("userId") Integer userId) {
-        return Response.status(Response.Status.OK).entity(userService.findUser(userId)).build();
+    public UserDTO getUser(@PathVariable("userId") Integer userId) {
+        return userService.findUser(userId);
     }
 
 
     @RequestMapping(value = "/update/user", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-    public Response updateUser(@Context HttpServletRequest request, @RequestBody User user) {
+    public void updateUser(@Context HttpServletRequest request, @RequestBody User user) {
         Integer userId = provider.getUserId(request);
         userService.updateUser(user, userId);
-        return Response.ok().build();
-    }
-
-    @RequestMapping(value = "/utils/oldPasswordMatchesNew", method = RequestMethod.POST, consumes = "application/json")
-    public Response pwRequestCheck(@Context HttpServletRequest request, String requestedPw) {
-        Integer userId = provider.getUserId(request);
-        requestedPw = encoder.encode(requestedPw);
-        return Response.ok(userService.requestedPasswordMatchesCurrentPassword(userId, requestedPw)).build();
     }
 
     @RequestMapping(value = "/deactivate/{userId}", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-    public Response deactivateUser(@PathVariable("userId") Integer userId) {
-        return Response.ok(userService.deactivateUser(userId)).build();
+    public String deactivateUser(@PathVariable("userId") Integer userId) {
+        return userService.deactivateUser(userId);
     }
 }

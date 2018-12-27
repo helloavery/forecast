@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.ws.rs.core.Response;
 
 @RestController
-@RequestMapping("/api/verify_email")
+@RequestMapping("v1/verification/verify_email")
 public class VerificationResource {
 
     private final VerificationService verificationService;

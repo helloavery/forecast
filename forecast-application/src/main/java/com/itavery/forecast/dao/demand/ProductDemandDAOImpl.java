@@ -21,17 +21,20 @@ import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Repository
 public class ProductDemandDAOImpl implements ProductDemandDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductDemandDAOImpl.class);
 
     private final DemandAssembler demandAssembler;
 
+    @Inject
     public ProductDemandDAOImpl(final DemandAssembler demandAssembler) {
         this.demandAssembler = demandAssembler;
     }

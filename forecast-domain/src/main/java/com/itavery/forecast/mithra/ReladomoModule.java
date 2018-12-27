@@ -10,8 +10,7 @@ package com.itavery.forecast.mithra;
  *===========================================================================*/
 
 import com.itavery.forecast.bootconfig.ProgramArguments;
-import com.itavery.forecast.credentials.CredentialObtainer;
-import com.itavery.forecast.credentials.Credentials;
+import com.itavery.forecast.credentials.SecretsRetrieval;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,19 +21,12 @@ import java.util.Properties;
 public class ReladomoModule {
 
     private final ProgramArguments programArguments;
+    private final SecretsRetrieval secretsRetrieval;
 
-    public ReladomoModule(final ProgramArguments programArguments){
+    public ReladomoModule(final ProgramArguments programArguments, final SecretsRetrieval secretsRetrieval){
         this.programArguments = programArguments;
+        this.secretsRetrieval = secretsRetrieval;
     }
-
-    private String DATASOURCE_DRIVER = "forecast.driverClassName";
-    private String DATASOURCE_URL = "forecast.datasourceUrl";
-    private String DATASOURCE_SCHEMA = "forecast.schema";
-    private String DATASOURCE_USERNAME = "forecast.datasourceUsername";
-    private String DATASOURCE_PASSWORD = "forecast.datasourcePassword";
-    private String DATASOURCE_SHOW_SQL = "showSql";
-    private String DATASOURCE_DDL_AUTO = "hbm2ddlAuto";
-    private String DATASOURCE_SESSION_CONTEXT = "current_session_context_class";
 
     @Bean
     ForecastSessionManager forecastSessionManager() {
@@ -48,26 +40,23 @@ public class ReladomoModule {
         }
     }
 
-    private Properties getProperties() {
-        final String datasourceDriver = DATASOURCE_DRIVER;
-        final String datasourceUrl = DATASOURCE_URL;
-        final String datasourceSchema = DATASOURCE_SCHEMA;
-        final String datasourceUsername = DATASOURCE_USERNAME;
-        final String datasourcePassword = DATASOURCE_PASSWORD;
-        final String datasourceShowSql = DATASOURCE_SHOW_SQL;
-        final String datasourceDdlAuto = DATASOURCE_DDL_AUTO;
-        final String datasourceSessionContext = DATASOURCE_SESSION_CONTEXT;
+    private Properties getProperties(){
+        final String DATASOURCE_DRIVER = "forecast.driverClassName";
+        final String DATASOURCE_URL = "forecast.datasourceUrl";
+        final String DATASOURCE_SCHEMA = "forecast.schema";
+        final String DATASOURCE_USERNAME = "forecast.datasourceUsername";
+        final String DATASOURCE_PASSWORD = "forecast.datasourcePassword";
+        final String DATASOURCE_SHOW_SQL = "showSql";
+        final String DATASOURCE_SESSION_CONTEXT = "current_session_context_class";
 
-        CredentialObtainer credentialObtainer = new Credentials(programArguments.getFilename());
         Properties properties = new Properties();
-        properties.setProperty(datasourceDriver, programArguments.getDriverClass());
-        properties.setProperty(datasourceUrl, programArguments.getDataSource());
-        properties.setProperty(datasourceSchema, programArguments.getSchema());
-        properties.setProperty(datasourceUsername, credentialObtainer.getKey());
-        properties.setProperty(datasourcePassword, credentialObtainer.getValue());
-        properties.setProperty(datasourceShowSql, programArguments.getShowSql());
-        properties.setProperty(datasourceDdlAuto, programArguments.getHibernateDdlAuto());
-        properties.setProperty(datasourceSessionContext, programArguments.getSessionContextClass());
+        properties.setProperty(DATASOURCE_DRIVER, programArguments.getDriverClass());
+        properties.setProperty(DATASOURCE_URL, programArguments.getDataSource());
+        properties.setProperty(DATASOURCE_SCHEMA, programArguments.getSchema());
+        properties.setProperty(DATASOURCE_USERNAME, secretsRetrieval.getKeyringKey());
+        properties.setProperty(DATASOURCE_PASSWORD, secretsRetrieval.getKeyringValue());
+        properties.setProperty(DATASOURCE_SHOW_SQL, programArguments.getShowSql());
+        properties.setProperty(DATASOURCE_SESSION_CONTEXT, programArguments.getSessionContextClass());
         return properties;
     }
 }

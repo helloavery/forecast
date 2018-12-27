@@ -21,9 +21,12 @@ import com.itavery.forecast.service.audit.AuditService;
 import com.itavery.forecast.validator.ProductForecastValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.List;
 
+@Service
 public class ProductForecastServiceImpl implements ProductForecastService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductForecastServiceImpl.class);
@@ -32,6 +35,7 @@ public class ProductForecastServiceImpl implements ProductForecastService {
     private final ProductForecastDAO productForecastDAO;
     private ProductForecastValidator productForecastValidator;
 
+    @Inject
     public ProductForecastServiceImpl(final AuditService auditService, final ProductForecastDAO productForecastDAO, ProductForecastValidator productForecastValidator) {
         this.auditService = auditService;
         this.productForecastDAO = productForecastDAO;

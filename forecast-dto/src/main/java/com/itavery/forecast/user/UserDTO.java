@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
 
+    private Integer userId;
+    private Integer authyUserId;
     private String firstName;
     private String lastName;
     private String username;
@@ -13,6 +15,22 @@ public class UserDTO {
     private String countryCode;
     private String phoneNumber;
     private String region;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getAuthyUserId() {
+        return authyUserId;
+    }
+
+    public void setAuthyUserId(Integer authyUserId) {
+        this.authyUserId = authyUserId;
+    }
 
     public String getFirstName() {
         return firstName;

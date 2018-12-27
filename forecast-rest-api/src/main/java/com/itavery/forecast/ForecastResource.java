@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productForecast")
+@RequestMapping("v1/productForecast")
 public class ForecastResource {
 
     private ProductForecastService productForecastService;

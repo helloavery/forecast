@@ -13,12 +13,10 @@ import com.gs.fw.common.mithra.MithraManagerProvider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-@Primary
 public class TransactionInterceptor {
 
     @Around("@annotation(com.itavery.forecast.mithra.annotation.Transactional)")

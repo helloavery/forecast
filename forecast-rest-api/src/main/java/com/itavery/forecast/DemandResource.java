@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productDemand")
+@RequestMapping("v1/productDemand")
 public class DemandResource {
 
     private final ProductDemandService productDemandService;

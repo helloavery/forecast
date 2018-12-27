@@ -14,7 +14,11 @@ import com.itavery.forecast.dao.audit.AuditDAO;
 import com.itavery.forecast.product.ProductType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+
+@Service
 public class AuditServiceImpl implements AuditService {
 
     private final static Logger LOGGER = LogManager.getLogger(AuditServiceImpl.class);
@@ -25,6 +29,7 @@ public class AuditServiceImpl implements AuditService {
 
     private final AuditDAO auditDAO;
 
+    @Inject
     public AuditServiceImpl(AuditDAO auditDAO) {
         this.auditDAO = auditDAO;
     }

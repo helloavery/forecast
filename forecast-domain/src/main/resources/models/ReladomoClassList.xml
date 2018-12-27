@@ -13,7 +13,6 @@
     <MithraObjectResource name="ProductForecastDB"/>
     <MithraObjectResource name="RolesDB"/>
     <MithraObjectResource name="SequenceDB"/>
-    <MithraObjectResource name="UserCredsDB"/>
     <MithraObjectResource name="UserRolesDB"/>
     <MithraObjectResource name="UsersDB"/>
 </Mithra>

@@ -20,4 +20,5 @@
     <Attribute name="emailVerified" javaType="boolean" columnName="email_verified" nullable="false"/>
     <Attribute name="userId" javaType="int" columnName="user_id" primaryKey="true"/>
     <Attribute name="activeAndVerified" javaType="boolean" columnName="active_and_verified" nullable="false"/>
+
 </MithraObject>

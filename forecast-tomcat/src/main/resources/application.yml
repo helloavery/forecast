@@ -24,6 +24,9 @@ spring.main.allow-bean-definition-overriding: true
 logging.level.com.forecast.itavery: INFO
 logging.level.org.hibernate: ERROR
 logging.level.org.postgres: ERROR
-logging.file: logs/forecaster-log.log
+logging.file: logs/forecasterLog.log
 
-
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update

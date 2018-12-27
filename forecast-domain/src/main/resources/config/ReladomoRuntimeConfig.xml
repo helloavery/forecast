@@ -11,7 +11,6 @@
                                    cacheType="partial"/>
         <MithraObjectConfiguration className="com.itavery.forecast.mithra.organization.RolesDB" cacheType="partial"/>
         <MithraObjectConfiguration className="com.itavery.forecast.mithra.sequence.SequenceDB" cacheType="partial"/>
-        <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UserCredsDB" cacheType="partial"/>
         <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UserRolesDB" cacheType="partial"/>
         <MithraObjectConfiguration className="com.itavery.forecast.mithra.user.UsersDB" cacheType="partial"/>
     </ConnectionManager>

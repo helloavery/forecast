@@ -12,6 +12,7 @@ package com.itavery.forecast.service.email;
 import com.itavery.forecast.ForecastConstants;
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.bootconfig.ProgramArguments;
+import com.itavery.forecast.credentials.SecretsRetrieval;
 import com.itavery.forecast.exceptions.EmailSenderException;
 import com.itavery.forecast.service.audit.AuditService;
 import net.sargue.mailgun.Configuration;
@@ -21,8 +22,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 
+@Service
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger LOGGER = LogManager.getLogger(EmailServiceImpl.class);
@@ -30,13 +34,16 @@ public class EmailServiceImpl implements EmailService {
     private AuditService auditService;
     private final VelocityEngine velocityEngine;
     private final ProgramArguments programArguments;
+    private final SecretsRetrieval secretsRetrieval;
 
-    public EmailServiceImpl(AuditService auditService, final VelocityEngine velocityEngine, final ProgramArguments programArguments){
+    @Inject
+    public EmailServiceImpl(AuditService auditService, final VelocityEngine velocityEngine, final ProgramArguments programArguments, final SecretsRetrieval secretsRetrieval){
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         this.auditService = auditService;
         this.velocityEngine = velocityEngine;
         this.programArguments = programArguments;
+        this.secretsRetrieval = secretsRetrieval;
     }
 
     @Override
@@ -77,7 +84,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             Configuration configuration = new Configuration()
                     .domain(ForecastConstants.MAILGUN_DOMAIN_NAME)
-                    .apiKey(programArguments.getMailgunPrivateKey())
+                    .apiKey(secretsRetrieval.getMailgunApiKey())
                     .from("Do-Not-Reply", "donotreply@forecaster.itavery.com");
             Mail.using(configuration)
                     .to(emailAddress)

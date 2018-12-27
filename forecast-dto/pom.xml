@@ -13,4 +13,12 @@
 
     <artifactId>forecast-dto</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.itavery.forecast</groupId>
+            <artifactId>forecast-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

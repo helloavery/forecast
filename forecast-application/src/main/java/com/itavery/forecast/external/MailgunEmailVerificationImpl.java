@@ -1,28 +1,33 @@
 package com.itavery.forecast.external;
 
 import com.itavery.forecast.ForecastConstants;
-import com.itavery.forecast.bootconfig.ProgramArguments;
+import com.itavery.forecast.credentials.SecretsRetrieval;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+
+@Service
 public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
 
     private static final Logger LOGGER = LogManager.getLogger(MailgunEmailVerificationImpl.class);
 
-    private final ProgramArguments programArguments;
+    private final SecretsRetrieval secretsRetrieval;
 
-    public MailgunEmailVerificationImpl(final ProgramArguments programArguments){
-        this.programArguments = programArguments;
+    @Inject
+    public MailgunEmailVerificationImpl(final SecretsRetrieval secretsRetrieval){
+        this.secretsRetrieval = secretsRetrieval;
     }
 
     @Override
     public JsonNode validateEmail(String email) throws Exception {
         try{
             HttpResponse<JsonNode> request = Unirest.get(ForecastConstants.MAILGUN_MAILBOX_VERIFICATION_URL)
-                    .basicAuth("api", programArguments.getMailgunPrivateKey())
+                    .basicAuth("api", secretsRetrieval.getMailgunApiKey())
                     .queryString("address", email)
                     .asJson();
             if(request == null){
@@ -30,7 +35,6 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
                 throw new RuntimeException("Error retrieving email validation response");
             }
             return request.getBody();
-
         }
         catch(Exception e){
             LOGGER.error("Issue validating account for e-mail {}", email);

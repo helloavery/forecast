@@ -16,9 +16,12 @@ import com.itavery.forecast.service.audit.AuditService;
 import com.mashape.unirest.http.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.security.SecureRandom;
 
+@Service
 public class VerificationServiceImpl implements VerificationService{
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationServiceImpl.class);
@@ -27,6 +30,7 @@ public class VerificationServiceImpl implements VerificationService{
     private AuditService auditService;
     private final MailgunEmailVerification mailgunEmailVerification;
 
+    @Inject
     public VerificationServiceImpl(VerificationDAO verificationDAO, AuditService auditService, final MailgunEmailVerification mailgunEmailVerification){
         this.verificationDAO = verificationDAO;
         this.auditService = auditService;

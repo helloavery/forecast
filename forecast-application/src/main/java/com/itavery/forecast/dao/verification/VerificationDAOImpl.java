@@ -19,7 +19,9 @@ import com.itavery.forecast.mithra.user.EmailTokenDBFinder;
 import com.itavery.forecast.user.AccountStatusType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class VerificationDAOImpl implements VerificationDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationDAOImpl.class);
@@ -62,7 +64,7 @@ public class VerificationDAOImpl implements VerificationDAO {
     public String updateAccountStatus(String email) throws DAOException {
         String returnMessage = null;
         try {
-            AccountStatusDB accountStatusDB = AccountStatusDBFinder.findOne(AccountStatusDBFinder.accountStatuses().email().eq(email));
+            AccountStatusDB accountStatusDB = AccountStatusDBFinder.findOne(AccountStatusDBFinder.user().email().eq(email));
             if (accountStatusDB != null) {
                 Character status = accountStatusDB.getStatus();
                 if (status.equals(AccountStatusType.ACTIVE.getCode())) {

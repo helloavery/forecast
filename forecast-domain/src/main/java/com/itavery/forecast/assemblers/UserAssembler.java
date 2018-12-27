@@ -19,6 +19,8 @@ public class UserAssembler {
 
     public UserDTO covertToDTO(UsersDB userDB) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId(userDB.getUserId());
+        userDTO.setAuthyUserId(userDB.getAuthyUserId());
         userDTO.setFirstName(userDB.getFirstName());
         userDTO.setLastName(userDB.getLastName());
         userDTO.setUsername(userDB.getUsername());

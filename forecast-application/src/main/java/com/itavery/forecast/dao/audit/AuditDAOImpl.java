@@ -17,10 +17,12 @@ import com.itavery.forecast.mithra.user.AuditTrailDB;
 import com.itavery.forecast.product.ProductType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
+@Repository
 public class AuditDAOImpl implements AuditDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(AuditDAOImpl.class);

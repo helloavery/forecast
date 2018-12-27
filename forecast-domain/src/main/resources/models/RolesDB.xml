@@ -21,4 +21,8 @@
 
     <Attribute name="role" javaType="char" columnName="role" nullable="false"/>
 
+    <Relationship name="users" relatedObject="UsersDB" cardinality="many-to-many">
+        UserRolesDB.roleId = this.roleId and UsersDB.userId = UserRolesDB.roleId
+    </Relationship>
+
 </MithraObject>

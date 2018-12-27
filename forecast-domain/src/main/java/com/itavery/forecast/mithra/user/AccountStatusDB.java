@@ -1,4 +1,6 @@
 package com.itavery.forecast.mithra.user;
+import com.gs.fw.common.mithra.util.DefaultInfinityTimestamp;
+
 import java.sql.Timestamp;
 public class AccountStatusDB extends AccountStatusDBAbstract
 {
@@ -14,5 +16,12 @@ public class AccountStatusDB extends AccountStatusDBAbstract
 	public AccountStatusDB()
 	{
 		this(com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity());
+	}
+
+	public AccountStatusDB(char status, boolean emailVerified, boolean activeAndVerified){
+		super(DefaultInfinityTimestamp.getDefaultInfinity());
+		this.setStatus(status);
+		this.setEmailVerified(emailVerified);
+		this.setActiveAndVerified(activeAndVerified);
 	}
 }

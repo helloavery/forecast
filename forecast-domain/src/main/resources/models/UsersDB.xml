@@ -25,6 +25,7 @@
                            initialValue="1"
                            incrementSize="1"/>
     </Attribute>
+    <Attribute name="authyUserId" javaType="int" columnName="authy_user_id" nullable="false" primaryKey="false"/>
     <Attribute name="firstName" javaType="String" columnName="first_name" nullable="false" maxLength="36"/>
     <Attribute name="lastName" javaType="String" columnName="last_name" nullable="false" maxLength="36"/>
     <Attribute name="username" javaType="String" columnName="username" nullable="false" maxLength="255"/>
@@ -33,17 +34,11 @@
     <Attribute name="phoneNumber" javaType="String" columnName="phone_number" nullable="false" maxLength="12"/>
     <Attribute name="region" javaType="String" columnName="region" nullable="false" maxLength="24"/>
 
-    <Relationship name="accountStatus" relatedObject="AccountStatusDB" cardinality="one-to-one"
-                  reverseRelationshipName="accountStatuses" relatedIsDependent="true">
-        this.userId = AccountStatusDB.userId
+    <Relationship name="accountStatus" relatedObject="AccountStatusDB" cardinality="one-to-one" reverseRelationshipName="user" relatedIsDependent="true">
+        AccountStatusDB.userId = this.userId
     </Relationship>
 
-    <Relationship name="userCredentials" relatedObject="UserCredsDB" cardinality="one-to-one"
-                  reverseRelationshipName="userCredentials" relatedIsDependent="true">
-        this.userId = UserCredsDB.userId
-    </Relationship>
-
-    <Relationship name="roles" relatedObject="RolesDB" cardinality="many-to-many" reverseRelationshipName="roles">
+    <Relationship name="roles" relatedObject="RolesDB" cardinality="many-to-many">
         UserRolesDB.userId = this.userId and RolesDB.roleId = UserRolesDB.roleId
     </Relationship>
 
@@ -65,6 +60,8 @@
     <Index name="users_index0" unique="true">userId,email,username</Index>
     <Index name="users_index1" unique="true">username</Index>
     <Index name="users_index2" unique="true">email</Index>
+    <Index name="users_index3" unique="true">userId,authyUserId,email,username</Index>
+
 
 
 </MithraObject>

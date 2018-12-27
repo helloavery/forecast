@@ -15,21 +15,20 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Arrays;
 import java.util.List;
 
 
-@SpringBootApplication(scanBasePackages = "com.itavery.forecast")
+@SpringBootApplication
 @ComponentScan(basePackages = "com.itavery.forecast")
-@EntityScan(basePackages = "com.itavery.forecast")
 public class ForecastLauncher implements ApplicationRunner {
 
     private static final Logger LOGGER = LogManager.getLogger(ForecastLauncher.class);
 
-    private final List<String> startupParams = Arrays.asList("datasource", "schema", "mailgunPublicKey", "mailgunPrivateKey", "filename", "hibernateDdlAuto", "environment");
+    private final List<String> startupParams = Arrays.asList("datasource", "schema", "s3gatewayendpoint", "s3bucket", "s3bucketObjectKeyring",
+            "s3bucketObjectMailgun", "s3bucketObjectAuthy", "s3bucketObjectTwilio", "environment");
 
     public static void main(String[] args) {
         SpringApplication.run(ForecastLauncher.class, args);

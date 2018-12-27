@@ -20,9 +20,12 @@ import com.itavery.forecast.service.audit.AuditService;
 import com.itavery.forecast.validator.ProductDemandValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.List;
 
+@Service
 public class ProductDemandServiceImpl implements ProductDemandService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductDemandServiceImpl.class);
@@ -30,6 +33,7 @@ public class ProductDemandServiceImpl implements ProductDemandService {
     private final ProductDemandDAO productDemandDAO;
     private ProductDemandValidator productDemandValidator;
 
+    @Inject
     public ProductDemandServiceImpl(final AuditService auditService, final ProductDemandDAO productDemandDAO, ProductDemandValidator productDemandValidator) {
         this.auditService = auditService;
         this.productDemandDAO = productDemandDAO;
