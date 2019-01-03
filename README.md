@@ -17,7 +17,7 @@ Based on Kickstarter data (Product Demand and Product Forecast). [You can grab t
 * Mailgun (transactional API) handles sending e-mails, as well as verifying valid e-mail addresses
 * Possibly might incorporate R
 
-[forecastdata]: https://averygrimes.com/experience/experience#dataanalysis
+[forecastdata]: https://averygrimes.com/experience/experience#softwareengineer
 [reladomohomepage]: https://github.com/goldmansachs/reladomo
 [s3gateway]: https://github.com/helloavery/s3-gateway
 
