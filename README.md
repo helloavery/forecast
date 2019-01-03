@@ -4,7 +4,7 @@ An analytical dashboard for supply chain forecasting
 
 Currently solely developed and maintained by Avery Grimes-Farrow (Avery Grimes)
 
-Based on Kickstarter data (Product Demand and Product Forecast). [You can grab the data from here][forecastdata]
+Based on Kickstarter data (Product Demand and Product Forecast). [You can grab the data from here][forecastdata] (under 'Project - Forecaster')
 
 # Structure
 
