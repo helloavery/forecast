@@ -47,8 +47,8 @@ public class S3GatewayServiceImpl implements S3GatewayService{
     private static final String SHA256 = "SHA256WithRSA";
     private static final String RSA = "RSA";
     private static final String DSA = "DSA";
-    private static final String ADD_BUCKET_OBJECT = "/rest/api/s3bucketOperations/addItemRequest";
-    private static final String RETRIEVE_BUCKET_OBJECT = "/rest/api/s3bucketOperations/getItemRequest";
+    private static final String ADD_BUCKET_OBJECT = "/rest/v1/s3bucketOperations/addItemRequest";
+    private static final String RETRIEVE_BUCKET_OBJECT = "/rest/v1/s3bucketOperations/getItemRequest";
 
     private void init(){
         try{
