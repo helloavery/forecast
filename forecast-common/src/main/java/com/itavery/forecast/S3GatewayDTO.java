@@ -24,11 +24,26 @@ public class S3GatewayDTO {
         super();
     }
 
-    public S3GatewayDTO(String bucket, String bucketObject, long ehcacheVariable, byte[] publicKey){
+    public S3GatewayDTO(String bucket, String bucketObject, byte[] publicKey){
         this.bucket = bucket;
         this.bucketObject = bucketObject;
+        this.publicKey = publicKey;
+    }
+
+    public S3GatewayDTO(String bucket, String bucketObject, byte[] cipherText, long ehcacheVariable){
+        this.bucket = bucket;
+        this.bucketObject = bucketObject;
+        this.cipherText = cipherText;
+        this.ehcacheVariable = ehcacheVariable;
+    }
+
+    public S3GatewayDTO(String bucket, String bucketObject, byte[] cipherText, long ehcacheVariable, byte[] publicKey, byte[] signature){
+        this.bucket = bucket;
+        this.bucketObject = bucketObject;
+        this.cipherText = cipherText;
         this.ehcacheVariable = ehcacheVariable;
         this.publicKey = publicKey;
+        this.signature = signature;
     }
 
     public S3GatewayDTO(byte[] cipherText, byte[] publicKey, byte[] signature){
