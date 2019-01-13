@@ -1,23 +1,31 @@
 package com.itavery.forecast.external;
 
+import com.google.common.base.Stopwatch;
 import com.itavery.forecast.S3GatewayDTO;
 import com.itavery.forecast.bootconfig.ProgramArguments;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * File created by Avery Grimes-Farrow
@@ -30,33 +38,34 @@ public class S3GatewayServiceImpl implements S3GatewayService{
 
     private static final Logger LOGGER = LogManager.getLogger(S3GatewayServiceImpl.class);
 
+    private ExecutorService executor = Executors.newFixedThreadPool(4);
+
     private ProgramArguments programArguments;
-    private S3GatewayOperation s3GatewayOperation;
     private final RestTemplate restTemplate;
     private Cipher cipher;
+    private KeyGenerator keyGenerator;
     private Signature signature;
 
     @Inject
-    public S3GatewayServiceImpl(ProgramArguments programArguments, final RestTemplate restTemplate, S3GatewayOperation s3GatewayOperation){
+    public S3GatewayServiceImpl(ProgramArguments programArguments, final RestTemplate restTemplate){
         this.programArguments = programArguments;
-        this.s3GatewayOperation = s3GatewayOperation;
         this.restTemplate = restTemplate;
-        init();
+        setup();
     }
 
     private static final String AES_CBC_PKCS5PADDING = "AES/CBC/PKCS5Padding";
     private static final String SHA256 = "SHA256WithRSA";
+    private static final String AES = "AES";
     private static final String RSA = "RSA";
-    private static final String DSA = "DSA";
-    private static final String REQUEST_PUB_KEY = "/rest/v1/crypto/requestPubKey";
+    private static final String SEND_SYMMETRIC_KEY_REQUEST = "/rest/v1/crypto/generateSymmetricKey";
     private static final String ADD_BUCKET_OBJECT = "/rest/v1/s3bucketOperations/uploadAsset";
     private static final String RETRIEVE_BUCKET_OBJECT = "/rest/v1/s3bucketOperations/getItemRequest";
 
-    private void init(){
+    private void setup(){
         try{
-            s3GatewayOperation.setup();
-            this.cipher = s3GatewayOperation.cipherGetInstance(RSA);
-            this.signature = s3GatewayOperation.initSignature(SHA256);
+            Security.addProvider(new BouncyCastleProvider());
+            this.keyGenerator = KeyGenerator.getInstance(AES);
+            this.signature = Signature.getInstance(SHA256);
         }
         catch(Exception e){
             LOGGER.error("Error initiating S3 Service");
@@ -65,23 +74,27 @@ public class S3GatewayServiceImpl implements S3GatewayService{
     }
 
     @Override
-    public String retrieveSecrets(String bucket, String bucketObject){
+    public Future<String> retrieveSecrets(String bucket, String bucketObject){
         try{
-            LOGGER.info("Retrieving secrets for bucket {} and object {}", bucket,bucketObject);
-            KeyPair keyPair = s3GatewayOperation.generateKeyPair(RSA, 2048);
-            S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, keyPair.getPublic().getEncoded());
-            S3GatewayDTO s3GatewayResponse = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
-            if(s3GatewayResponse == null){
-                LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}", bucket,bucketObject);
-                throw new RuntimeException("Error making call to S3 Gateway Service to retrieve secrets");
-            }
-            PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayResponse.getPublicKey()));
-            byte[] decryptedData = decryptSecrets(keyPair.getPrivate(), s3GatewayResponse.getCipherText());
-            if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayResponse.getSignature())){
-                LOGGER.error("Error retrieving bucket object {}", bucketObject);
-                throw new RuntimeException("Error retrieving bucket object");
-            }
-            return new String(decryptedData,StandardCharsets.UTF_8);
+            return executor.submit(() -> {
+                LOGGER.info("Retrieving secrets for bucket {} and object {}", bucket,bucketObject);
+                KeyPair keyPair = generateKeyPair(RSA, 2048);
+                S3GatewayDTO symmetricKeyAndUUID = retrieveS3GatewaySymmetricKey(keyPair.getPublic().getEncoded());
+                SecretKey secretKey = decryptSymmetricKey(symmetricKeyAndUUID.getSymmetricKey(), keyPair.getPrivate());
+                S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, symmetricKeyAndUUID.getSymmetricKeyUUID());
+                S3GatewayDTO s3GatewayResponse = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
+                if(s3GatewayResponse == null){
+                    LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}", bucket,bucketObject);
+                    throw new RuntimeException("Error making call to S3 Gateway Service to retrieve secrets");
+                }
+                PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayResponse.getPublicKey()));
+                byte[] decryptedData = decryptData(s3GatewayResponse.getCipherText(),secretKey);
+                if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayResponse.getSignature())){
+                    LOGGER.error("Error retrieving bucket object {}, signature verification came back as false", bucketObject);
+                    throw new RuntimeException("Error retrieving bucket object, signature verification came back as false");
+                }
+                return new String(decryptedData,StandardCharsets.UTF_8);
+            });
         }
         catch(Exception e){
             LOGGER.error("Error retrieving bucket object {}", bucketObject);
@@ -90,40 +103,64 @@ public class S3GatewayServiceImpl implements S3GatewayService{
     }
 
     @Override
-    public void sendSecrets(String bucket, String bucketObject, String data){
-        try{
-            long ehcacheVariable = new SecureRandom().nextLong();
-            byte[] requestedEncodedPublicKey = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + REQUEST_PUB_KEY, ehcacheVariable, byte[].class);
-            if(requestedEncodedPublicKey == null){
-                LOGGER.error("Error making call to S3 Gateway Service to generated and receive pub key");
-                throw new RuntimeException("Error making call to S3 Gateway Service to generated and receive pub key");
-            }
-            KeyPair keyPair = s3GatewayOperation.generateKeyPair(SHA256, 2048);
-            PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(requestedEncodedPublicKey));
-            byte[] encryptedData = encryptSecrets(data, decodedPublicKey);
-            byte[] digitalSignature = generateSignature(keyPair, encryptedData);
-            S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, encryptedData, ehcacheVariable, keyPair.getPublic().getEncoded(), digitalSignature);
-            Boolean successfulUpload = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + ADD_BUCKET_OBJECT, s3GatewayRequest, Boolean.class);
-            if(successfulUpload == null){
-                LOGGER.error("Error making call to S3 Gateway Service to upload secrets for bucket {} and object {}", bucket,bucketObject);
+    public boolean sendSecrets(String bucket, String bucketObject, String data) {
+        try {
+            LOGGER.info("Starting Uploading Secrets Job");
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            KeyPair keyPair = generateKeyPair(RSA, 2048);
+            S3GatewayDTO symmetricKeyAndUUID = retrieveS3GatewaySymmetricKey(keyPair.getPublic().getEncoded());
+            SecretKey secretKey = decryptSymmetricKey(symmetricKeyAndUUID.getSymmetricKey(), keyPair.getPrivate());
+            byte[] encryptedData = encryptData(data.getBytes(StandardCharsets.UTF_8), secretKey);
+            byte[] digitalSignature = generateSignature(keyPair, data.getBytes(StandardCharsets.UTF_8));
+            S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, encryptedData, symmetricKeyAndUUID.getSymmetricKeyUUID(), keyPair.getPublic().getEncoded(), digitalSignature);
+            Boolean successfulUpload = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + ADD_BUCKET_OBJECT, s3GatewayRequest, boolean.class);
+            if (successfulUpload == null) {
+                LOGGER.error("Error making call to S3 Gateway Service to upload secrets for bucket {} and object {}", bucket, bucketObject);
                 throw new RuntimeException("Error making call to S3 Gateway Service to upload secrets");
             }
-            if(!successfulUpload){
-                LOGGER.error("Error occurred in S3 Gateway Service while trying to upload secrets for bucket {} and object {}", bucket,bucketObject);
-                throw new RuntimeException("Error occurred in S3 Gateway Service while trying to upload secrets");
-            }
-        }
-        catch(Exception e){
+            stopwatch.stop();
+            LOGGER.info("Upload to S3 bucket complete, time took is {}", stopwatch.toString());
+            return successfulUpload;
+        } catch (Exception e) {
             LOGGER.error("Error sending bucket object {}", bucketObject);
             throw new RuntimeException("Error sending bucket object", e);
         }
     }
 
-    private byte[] encryptSecrets(String data, PublicKey publicKey) throws Exception{
+    private S3GatewayDTO retrieveS3GatewaySymmetricKey(byte[] publicKey){
         try{
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            byte[] dataInBytes = data.getBytes(StandardCharsets.UTF_8);
-            return cipher.doFinal(dataInBytes);
+            S3GatewayDTO requestedEncodedPublicKey = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + SEND_SYMMETRIC_KEY_REQUEST, publicKey, S3GatewayDTO.class);
+            if(requestedEncodedPublicKey == null){
+                LOGGER.error("Error making call to S3 Gateway Service to generated and receive pub key");
+                throw new RuntimeException("Error making call to S3 Gateway Service to generated and receive pub key");
+            }
+            return requestedEncodedPublicKey;
+        }
+        catch(Exception e){
+            LOGGER.error("Error retrieving encrypted encoded public key");
+            throw new RuntimeException("Error retrieving encrypted encoded public key",e);
+        }
+    }
+
+
+    private KeyPair generateKeyPair(String algorithm, Integer keySize){
+        try{
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+            if(keySize != null){
+                keyPairGenerator.initialize(keySize);
+            }
+            return keyPairGenerator.generateKeyPair();
+        }
+        catch(Exception e){
+            throw new RuntimeException();
+        }
+    }
+
+    private byte[] encryptData(byte[] data, SecretKey secretKey) throws Exception{
+        try{
+            cipher = Cipher.getInstance(AES);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);;
+            return cipher.doFinal(data);
         }
         catch(Exception e){
             LOGGER.error("Error encrypting data");
@@ -131,9 +168,22 @@ public class S3GatewayServiceImpl implements S3GatewayService{
         }
     }
 
-    private byte[] decryptSecrets(PrivateKey privateKey, byte[] cipherText) throws Exception{
+    private SecretKey decryptSymmetricKey(byte[] symmetricKey, PrivateKey privateKey) throws Exception{
         try{
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            cipher = Cipher.getInstance(RSA);
+            cipher.init(Cipher.UNWRAP_MODE, privateKey);
+            return (SecretKey) cipher.unwrap(symmetricKey, AES, Cipher.SECRET_KEY);
+        }
+        catch(Exception e){
+            LOGGER.error("Error decrypting data");
+            throw e;
+        }
+    }
+
+    private byte[] decryptData(byte[] cipherText, SecretKey secretKey) throws Exception{
+        try{
+            cipher = Cipher.getInstance(AES);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return cipher.doFinal(cipherText);
         }
         catch(Exception e){

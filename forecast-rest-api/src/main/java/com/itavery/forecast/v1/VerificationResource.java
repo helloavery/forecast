@@ -1,4 +1,4 @@
-package com.itavery.forecast;
+package com.itavery.forecast.v1;
 
 import com.itavery.forecast.service.verification.VerificationService;
 import org.springframework.web.bind.annotation.PathVariable;

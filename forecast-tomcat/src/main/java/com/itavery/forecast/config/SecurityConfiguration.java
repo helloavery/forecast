@@ -66,6 +66,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/rest/v1/productDemand/**").permitAll()
                 .antMatchers("/rest/v1/productForecast/**").permitAll()
                 .antMatchers("/rest/v1/users/**").permitAll()
+                //TODO:Remove PermitAll for admin resource
+                .antMatchers("/rest/v1/admin/**").permitAll()
                 .antMatchers("/accountverified").permitAll()
                 .antMatchers("/admin/**").hasAuthority("ADMIN").anyRequest()
                 .authenticated().and().csrf().disable().formLogin()

@@ -7,6 +7,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 /**
  * File created by Avery Grimes-Farrow
  * Created on: 2018-12-19
@@ -36,10 +39,18 @@ public class SecretsRetrieval implements InitializingBean {
     @Override
     public void afterPropertiesSet(){
         try{
-            ISecretsContainer mailgunSecretsContainer = new SecretsContainer(s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectMailgun()),false);
-            ISecretsContainer authySecretsContainer = new SecretsContainer(s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectAuthy()),false);
-            ISecretsContainer twilioSecretsContainer = new SecretsContainer(s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectTwilio()),true);
-            ISecretsContainer keyringSecretsContainer = new SecretsContainer(s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectKeyring()),true);
+            Future<String> mailgunFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectMailgun());
+            Future<String> authyFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectAuthy());
+            Future<String> twilioFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectTwilio());
+            Future<String> keyringFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectKeyring());
+            String mailgunSecrets = mailgunFuture.get(5000, TimeUnit.MILLISECONDS);
+            String authySecrets = authyFuture.get(5000, TimeUnit.MILLISECONDS);
+            String twilioSecrets = twilioFuture.get(5000, TimeUnit.MILLISECONDS);
+            String keyringSecrets = keyringFuture.get(5000, TimeUnit.MILLISECONDS);
+            ISecretsContainer mailgunSecretsContainer = new SecretsContainer(mailgunSecrets,false);
+            ISecretsContainer authySecretsContainer = new SecretsContainer(authySecrets,false);
+            ISecretsContainer twilioSecretsContainer = new SecretsContainer(twilioSecrets,true);
+            ISecretsContainer keyringSecretsContainer = new SecretsContainer(keyringSecrets,true);
             mailgunApiKey = mailgunSecretsContainer.getApiKey();
             authyApiKey = authySecretsContainer.getApiKey();
             twilioSid = twilioSecretsContainer.getkey();

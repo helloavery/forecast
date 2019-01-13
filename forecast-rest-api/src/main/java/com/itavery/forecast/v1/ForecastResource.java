@@ -1,5 +1,6 @@
-package com.itavery.forecast;
+package com.itavery.forecast.v1;
 
+import com.itavery.forecast.Provider;
 import com.itavery.forecast.product.ProductForecast;
 import com.itavery.forecast.product.ProductForecastDTO;
 import com.itavery.forecast.service.forecast.ProductForecastService;

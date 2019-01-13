@@ -1,5 +1,7 @@
 package com.itavery.forecast.external;
 
+import java.util.concurrent.Future;
+
 /**
  * File created by Avery Grimes-Farrow
  * Created on: 2018-12-17
@@ -8,7 +10,7 @@ package com.itavery.forecast.external;
 
 public interface S3GatewayService {
 
-    String retrieveSecrets(String bucket, String bucketObject);
+    Future<String> retrieveSecrets(String bucket, String bucketObject);
 
-    void sendSecrets(String bucket, String bucketObject, String data);
+    boolean sendSecrets(String bucket, String bucketObject, String data);
 }

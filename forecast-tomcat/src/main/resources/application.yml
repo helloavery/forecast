@@ -27,6 +27,10 @@ logging.level.org.postgres: ERROR
 logging.file: logs/forecasterLog.log
 
 spring:
+  batch:
+    job:
+      enabled: false
+
   jpa:
     hibernate:
       ddl-auto: update
