@@ -1,4 +1,4 @@
-package com.itavery.forecast.v1;
+package com.itavery.forecast.verification;
 
 import com.itavery.forecast.service.verification.VerificationService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,11 +10,11 @@ import javax.ws.rs.core.Response;
 
 @RestController
 @RequestMapping("v1/verification/verify_email")
-public class VerificationResource {
+public class VerificationResourceV1 {
 
     private final VerificationService verificationService;
 
-    public VerificationResource(VerificationService verificationService) {
+    public VerificationResourceV1(VerificationService verificationService) {
         this.verificationService = verificationService;
     }
 

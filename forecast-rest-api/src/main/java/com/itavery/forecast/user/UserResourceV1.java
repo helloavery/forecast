@@ -1,4 +1,4 @@
-package com.itavery.forecast.v1;
+package com.itavery.forecast.user;
 
 import com.itavery.forecast.Provider;
 import com.itavery.forecast.service.user.UserService;
@@ -21,12 +21,12 @@ import java.util.Base64;
 @RestController
 @RequestMapping("v1/users")
 @CrossOrigin
-public class UserResource {
+public class UserResourceV1 {
 
     private final UserService userService;
     private Provider provider;
 
-    public UserResource(UserService userService, Provider provider) {
+    public UserResourceV1(UserService userService, Provider provider) {
         this.userService = userService;
         this.provider = provider;
     }

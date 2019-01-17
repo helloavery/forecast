@@ -1,4 +1,4 @@
-package com.itavery.forecast.v1;
+package com.itavery.forecast.demand;
 
 import com.itavery.forecast.Provider;
 import com.itavery.forecast.product.ProductDemand;
@@ -17,12 +17,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("v1/productDemand")
-public class DemandResource {
+public class DemandResourceV1 {
 
     private final ProductDemandService productDemandService;
     private Provider provider;
 
-    public DemandResource(ProductDemandService productDemandService, Provider provider) {
+    public DemandResourceV1(ProductDemandService productDemandService, Provider provider) {
         this.productDemandService = productDemandService;
         this.provider = provider;
     }

@@ -1,4 +1,4 @@
-package com.itavery.forecast.v1;
+package com.itavery.forecast.admin;
 
 import com.itavery.forecast.FileReader;
 import com.itavery.forecast.external.S3GatewayService;
@@ -18,11 +18,11 @@ import javax.ws.rs.core.Response;
 
 @RestController
 @RequestMapping("v1/admin")
-public class AdminResource {
+public class AdminResourceV1 {
 
     private S3GatewayService s3GatewayService;
 
-    public AdminResource(S3GatewayService s3GatewayService){
+    public AdminResourceV1(S3GatewayService s3GatewayService){
         this.s3GatewayService = s3GatewayService;
     }
 
