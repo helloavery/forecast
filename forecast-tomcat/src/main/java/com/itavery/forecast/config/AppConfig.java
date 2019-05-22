@@ -3,6 +3,8 @@ package com.itavery.forecast.config;
 import com.itavery.forecast.SessionManager;
 import com.itavery.forecast.concurrent.ExecutorServiceBase;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletPath;
@@ -105,7 +107,10 @@ public class AppConfig implements Filter {
 
     @Bean
     public VelocityEngine velocityEngine(){
-        return new VelocityEngine();
+        VelocityEngine velocityEngine = new VelocityEngine();
+        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+        velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+        return velocityEngine;
     }
 
     @Bean
@@ -115,6 +120,6 @@ public class AppConfig implements Filter {
 
     @Bean
     ExecutorServiceBase executorServiceBase(){
-        return new ExecutorServiceBase(10);
+        return new ExecutorServiceBase();
     }
 }

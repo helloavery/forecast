@@ -23,12 +23,7 @@ public class ExecutorServiceBase implements ExecutorService {
 
     private static final Logger LOGGER = LogManager.getLogger(ExecutorServiceBase.class);
 
-    private int threads;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(threads);
-
-    public ExecutorServiceBase(int threads){
-        this.threads = threads;
-    }
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public void shutdown(){

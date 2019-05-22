@@ -36,11 +36,6 @@ public class EmailServiceImpl implements EmailService {
     @Inject
     private SecretsRetrieval secretsRetrieval;
 
-    public EmailServiceImpl(){
-        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-    }
-
     @Override
     public void sendEmailAddressVerificationEmail(String emailAddress, String name, String emailToken) throws Exception {
         String subject = "Please verify your Forecaster E-mail Address";

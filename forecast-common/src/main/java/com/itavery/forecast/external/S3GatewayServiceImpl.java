@@ -6,6 +6,9 @@ import com.itavery.forecast.bootconfig.ProgramArguments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -78,14 +81,16 @@ public class S3GatewayServiceImpl implements S3GatewayService{
             S3GatewayDTO symmetricKeyAndUUID = retrieveS3GatewaySymmetricKey(keyPair.getPublic().getEncoded());
             SecretKey secretKey = decryptSymmetricKey(symmetricKeyAndUUID.getSymmetricKey(), keyPair.getPrivate());
             S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, symmetricKeyAndUUID.getSymmetricKeyUUID());
-            S3GatewayDTO s3GatewayResponse = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
-            if(s3GatewayResponse == null){
-                LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}", bucket,bucketObject);
+            HttpEntity<S3GatewayDTO> request = new HttpEntity<>(s3GatewayRequest);
+            ResponseEntity<S3GatewayDTO> s3GatewayResponse = restTemplate.exchange(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, HttpMethod.POST, request, S3GatewayDTO.class);
+            if(s3GatewayResponse.getStatusCodeValue() != 200){
+                LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}, error {}", bucket,bucketObject, s3GatewayResponse.getStatusCodeValue());
                 throw new RuntimeException("Error making call to S3 Gateway Service to retrieve secrets");
             }
-            PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayResponse.getPublicKey()));
-            byte[] decryptedData = decryptData(s3GatewayResponse.getCipherText(),secretKey);
-            if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayResponse.getSignature())){
+            S3GatewayDTO s3GatewayDTOBody = s3GatewayResponse.getBody();
+            PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayDTOBody.getPublicKey()));
+            byte[] decryptedData = decryptData(s3GatewayDTOBody.getCipherText(),secretKey);
+            if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayDTOBody.getSignature())){
                 LOGGER.error("Error retrieving bucket object {}, signature verification came back as false", bucketObject);
                 throw new RuntimeException("Error retrieving bucket object, signature verification came back as false");
             }
