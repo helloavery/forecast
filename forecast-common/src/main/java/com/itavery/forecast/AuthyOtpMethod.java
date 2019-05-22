@@ -1,13 +1,10 @@
 package com.itavery.forecast;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2018-12-10            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-12-10
+ * https://github.com/helloavery
+ */
 
 public enum AuthyOtpMethod {
 

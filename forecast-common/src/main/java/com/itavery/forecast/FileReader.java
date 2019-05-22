@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * File created by Avery Grimes-Farrow
+ * @author Avery Grimes-Farrow
  * Created on: 2019-01-10
  * https://github.com/helloavery
  */

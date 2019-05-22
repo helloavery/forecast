@@ -1,14 +1,5 @@
 package com.itavery.forecast.service.audit;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  6/20/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.audit.AuditDAO;
 import com.itavery.forecast.product.ProductType;
@@ -18,6 +9,12 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-06-20
+ * https://github.com/helloavery
+ */
+
 @Service
 public class AuditServiceImpl implements AuditService {
 
@@ -26,13 +23,8 @@ public class AuditServiceImpl implements AuditService {
     private final static String USER_ACCOUNT_ACTIVITY = "ACCOUNT";
     private final static String EMAIL_ACCOUNT_ACTIVITY = "EMAIL";
     private final static String ENTRY_ACCOUNT_ACTIVITY = "ENTRY";
-
-    private final AuditDAO auditDAO;
-
     @Inject
-    public AuditServiceImpl(AuditDAO auditDAO) {
-        this.auditDAO = auditDAO;
-    }
+    private AuditDAO auditDAO;
 
     @Override
     public void createAudit(String username, AuditType auditCode, ProductType productType) throws Exception {

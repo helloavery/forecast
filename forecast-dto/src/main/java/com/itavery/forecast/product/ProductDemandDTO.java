@@ -1,6 +1,5 @@
 package com.itavery.forecast.product;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;

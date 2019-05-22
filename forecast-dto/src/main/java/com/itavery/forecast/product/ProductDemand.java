@@ -1,18 +1,14 @@
 package com.itavery.forecast.product;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/10/18
- |
- *===========================================================================*/
-
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-10
+ * https://github.com/helloavery
+ */
 
 public class ProductDemand implements Serializable {
 

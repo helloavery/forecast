@@ -1,14 +1,5 @@
 package com.itavery.forecast.service.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  1/30/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.user.LoginDTO;
 import com.itavery.forecast.user.RegistrationDTO;
@@ -16,6 +7,12 @@ import com.itavery.forecast.user.User;
 import com.itavery.forecast.user.UserDTO;
 
 import javax.servlet.http.HttpServletRequest;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-30
+ * https://github.com/helloavery
+ */
 
 public interface UserService {
 

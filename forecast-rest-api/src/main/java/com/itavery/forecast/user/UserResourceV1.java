@@ -2,10 +2,6 @@ package com.itavery.forecast.user;
 
 import com.itavery.forecast.Provider;
 import com.itavery.forecast.service.user.UserService;
-import com.itavery.forecast.user.LoginDTO;
-import com.itavery.forecast.user.RegistrationDTO;
-import com.itavery.forecast.user.User;
-import com.itavery.forecast.user.UserDTO;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import java.security.Principal;
@@ -23,13 +20,10 @@ import java.util.Base64;
 @CrossOrigin
 public class UserResourceV1 {
 
-    private final UserService userService;
+    @Inject
+    private UserService userService;
+    @Inject
     private Provider provider;
-
-    public UserResourceV1(UserService userService, Provider provider) {
-        this.userService = userService;
-        this.provider = provider;
-    }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public UserDTO createUser(@Context HttpServletRequest request, @RequestBody RegistrationDTO registrationDTO) {

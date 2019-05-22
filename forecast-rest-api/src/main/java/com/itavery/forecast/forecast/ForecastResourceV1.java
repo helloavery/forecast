@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -19,13 +20,10 @@ import java.util.List;
 @RequestMapping("v1/productForecast")
 public class ForecastResourceV1 {
 
+    @Inject
     private ProductForecastService productForecastService;
+    @Inject
     private Provider provider;
-
-    public ForecastResourceV1(ProductForecastService productForecastService, Provider provider) {
-        this.productForecastService = productForecastService;
-        this.provider = provider;
-    }
 
     @RequestMapping(value = "/entryDetails", method = RequestMethod.GET, produces = "application/json")
     public Response getForecastEntries(@Context HttpServletRequest request) {

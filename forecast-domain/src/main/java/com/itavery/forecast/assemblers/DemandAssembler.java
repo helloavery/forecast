@@ -1,13 +1,4 @@
 package com.itavery.forecast.assemblers;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.mithra.product.ProductDemandDB;
 import com.itavery.forecast.product.ProductDemandDTO;
@@ -16,6 +7,11 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.Date;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 @Component
 public class DemandAssembler {

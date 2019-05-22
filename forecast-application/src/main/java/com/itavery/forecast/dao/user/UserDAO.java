@@ -1,20 +1,15 @@
 package com.itavery.forecast.dao.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/18/18
- |
- *===========================================================================*/
-
-
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.user.UserDTO;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-18
+ * https://github.com/helloavery
+ */
 
 public interface UserDAO {
 

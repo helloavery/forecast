@@ -1,14 +1,5 @@
 package com.itavery.forecast.launch;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  3/31/18
- |
- *===========================================================================*/
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.ApplicationArguments;
@@ -20,6 +11,11 @@ import org.springframework.context.annotation.ComponentScan;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-03-31
+ * https://github.com/helloavery
+ */
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.itavery.forecast")

@@ -1,15 +1,12 @@
 package com.itavery.forecast.user;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  8/12/18            
- |            
- *===========================================================================*/
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-08-12
+ * https://github.com/helloavery
+ */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegistrationDTO {

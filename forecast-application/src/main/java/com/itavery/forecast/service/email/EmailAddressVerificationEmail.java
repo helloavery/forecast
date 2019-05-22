@@ -1,15 +1,6 @@
 package com.itavery.forecast.service.email;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/19/18            
- |            
- *===========================================================================*/
 
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
@@ -17,6 +8,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.StringWriter;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-19
+ * https://github.com/helloavery
+ */
 
 public class EmailAddressVerificationEmail extends EmailBase implements EmailContent{
 
@@ -42,7 +39,7 @@ public class EmailAddressVerificationEmail extends EmailBase implements EmailCon
         VelocityContext context = new VelocityContext();
         context.put("name", name);
         context.put("email", email);
-        context.put("VERIFY_EMAIL_LINK", String.format(getForecasterBaseUrl(environment) + ForecastConstants.VERIFY_EMAIL_ADDRESS_API, emailToken));
+        context.put("VERIFY_EMAIL_LINK", String.format(getForecasterBaseUrl(environment) + Constants.VERIFY_EMAIL_ADDRESS_API, emailToken));
         StringWriter writer = new StringWriter();
         template.merge(context, writer);
         return writer.toString();

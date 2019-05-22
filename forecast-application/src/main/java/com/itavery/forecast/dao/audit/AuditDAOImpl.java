@@ -1,15 +1,5 @@
 package com.itavery.forecast.dao.audit;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  6/20/18
- |
- *===========================================================================*/
-
-
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.product.AuditTrailProductDB;
@@ -21,6 +11,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Date;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-06-18
+ * https://github.com/helloavery
+ */
 
 @Repository
 public class AuditDAOImpl implements AuditDAO {

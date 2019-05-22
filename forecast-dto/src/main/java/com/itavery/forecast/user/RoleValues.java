@@ -1,13 +1,10 @@
 package com.itavery.forecast.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  3/10/18
- |
- *===========================================================================*/
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-03-10
+ * https://github.com/helloavery
+ */
 
 public enum RoleValues {
 

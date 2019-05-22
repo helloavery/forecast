@@ -1,13 +1,10 @@
 package com.itavery.forecast.regions;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/10/18
- |
- *===========================================================================*/
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-18
+ * https://github.com/helloavery
+ */
 
 public enum Regions {
 

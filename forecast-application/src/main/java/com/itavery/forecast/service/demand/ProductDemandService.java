@@ -1,19 +1,16 @@
 package com.itavery.forecast.service.demand;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  1/30/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;
 
 import java.util.List;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-01-30
+ * https://github.com/helloavery
+ */
 
 public interface ProductDemandService {
 

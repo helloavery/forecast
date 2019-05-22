@@ -1,14 +1,5 @@
 package com.itavery.forecast.util;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  3/10/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.user.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +7,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-03-10
+ * https://github.com/helloavery
+ */
 
 public class SerializeUser {
 

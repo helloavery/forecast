@@ -1,13 +1,10 @@
 package com.itavery.forecast;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/30/18            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-30
+ * https://github.com/helloavery
+ */
 
 public enum OperationResult {
 

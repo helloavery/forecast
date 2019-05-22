@@ -1,19 +1,16 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/5/18            
- |            
- *===========================================================================*/
 
 import com.gs.fw.common.mithra.MithraManagerProvider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-05
+ * https://github.com/helloavery
+ */
 
 @Aspect
 @Component

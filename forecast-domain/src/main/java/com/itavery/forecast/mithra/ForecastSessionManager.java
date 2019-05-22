@@ -1,19 +1,16 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.gs.fw.common.mithra.MithraManager;
 import com.gs.fw.common.mithra.MithraManagerProvider;
 
 import java.io.InputStream;
 import java.util.Properties;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 public class ForecastSessionManager {
 

@@ -6,17 +6,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 @RestController
 @RequestMapping("v1/verification/verify_email")
 public class VerificationResourceV1 {
 
-    private final VerificationService verificationService;
-
-    public VerificationResourceV1(VerificationService verificationService) {
-        this.verificationService = verificationService;
-    }
+    @Inject
+    private VerificationService verificationService;
 
     @RequestMapping(value = "/{token}", method = RequestMethod.GET, produces = "application/json")
     public Response verifyUser(@PathVariable("token") String token) throws Exception {

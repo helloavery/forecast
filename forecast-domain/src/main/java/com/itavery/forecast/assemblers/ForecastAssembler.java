@@ -1,17 +1,14 @@
 package com.itavery.forecast.assemblers;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.mithra.product.ProductForecastDB;
 import com.itavery.forecast.product.ProductForecastDTO;
 import org.springframework.stereotype.Component;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 @Component
 public class ForecastAssembler {

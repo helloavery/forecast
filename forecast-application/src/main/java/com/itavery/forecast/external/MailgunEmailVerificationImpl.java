@@ -1,6 +1,6 @@
 package com.itavery.forecast.external;
 
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.credentials.SecretsRetrieval;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -11,22 +11,23 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-01
+ * https://github.com/helloavery
+ */
+
 @Service
 public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
 
     private static final Logger LOGGER = LogManager.getLogger(MailgunEmailVerificationImpl.class);
-
-    private final SecretsRetrieval secretsRetrieval;
-
     @Inject
-    public MailgunEmailVerificationImpl(final SecretsRetrieval secretsRetrieval){
-        this.secretsRetrieval = secretsRetrieval;
-    }
+    private  SecretsRetrieval secretsRetrieval;
 
     @Override
     public JsonNode validateEmail(String email) throws Exception {
         try{
-            HttpResponse<JsonNode> request = Unirest.get(ForecastConstants.MAILGUN_MAILBOX_VERIFICATION_URL)
+            HttpResponse<JsonNode> request = Unirest.get(Constants.MAILGUN_MAILBOX_VERIFICATION_URL)
                     .basicAuth("api", secretsRetrieval.getMailgunApiKey())
                     .queryString("address", email)
                     .asJson();

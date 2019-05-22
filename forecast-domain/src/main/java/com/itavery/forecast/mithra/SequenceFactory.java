@@ -1,19 +1,16 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/16/18            
- |            
- *===========================================================================*/
 
 import com.gs.fw.common.mithra.MithraSequence;
 import com.gs.fw.common.mithra.MithraSequenceObjectFactory;
 import com.gs.fw.common.mithra.finder.Operation;
 import com.itavery.forecast.mithra.sequence.SequenceDB;
 import com.itavery.forecast.mithra.sequence.SequenceDBFinder;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-16
+ * https://github.com/helloavery
+ */
 
 public class SequenceFactory implements MithraSequenceObjectFactory {
 

@@ -1,14 +1,5 @@
 package com.itavery.forecast.dao.verification;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  4/29/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.OperationResult;
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.mithra.annotation.Transactional;
@@ -20,6 +11,12 @@ import com.itavery.forecast.user.AccountStatusType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-04-29
+ * https://github.com/helloavery
+ */
 
 @Repository
 public class VerificationDAOImpl implements VerificationDAO {

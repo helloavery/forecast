@@ -1,13 +1,4 @@
 package com.itavery.forecast.service.verification;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/22/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.verification.VerificationDAO;
@@ -21,21 +12,22 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.security.SecureRandom;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-22
+ * https://github.com/helloavery
+ */
+
 @Service
 public class VerificationServiceImpl implements VerificationService{
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationServiceImpl.class);
-
-    private VerificationDAO verificationDAO;
-    private AuditService auditService;
-    private final MailgunEmailVerification mailgunEmailVerification;
-
     @Inject
-    public VerificationServiceImpl(VerificationDAO verificationDAO, AuditService auditService, final MailgunEmailVerification mailgunEmailVerification){
-        this.verificationDAO = verificationDAO;
-        this.auditService = auditService;
-        this.mailgunEmailVerification = mailgunEmailVerification;
-    }
+    private VerificationDAO verificationDAO;
+    @Inject
+    private AuditService auditService;
+    @Inject
+    private MailgunEmailVerification mailgunEmailVerification;
 
     public String generateToken(String email){
         try{

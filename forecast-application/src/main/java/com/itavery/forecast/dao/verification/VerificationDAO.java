@@ -1,15 +1,12 @@
 package com.itavery.forecast.dao.verification;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  4/29/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.exceptions.DAOException;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-04-29
+ * https://github.com/helloavery
+ */
 
 public interface VerificationDAO {
 

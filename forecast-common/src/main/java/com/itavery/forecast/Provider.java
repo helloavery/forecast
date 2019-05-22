@@ -1,19 +1,16 @@
 package com.itavery.forecast;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  8/2/18            
- |            
- *===========================================================================*/
 
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-08-02
+ * https://github.com/helloavery
+ */
 
 @Component
 public class Provider {
@@ -33,7 +30,7 @@ public class Provider {
         }
         Cookie c = null;
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(ForecastConstants.COOKIE_USERNAME)) {
+            if (cookie.getName().equals(Constants.USER_NAME)) {
                 c = cookie;
                 break;
             }
@@ -55,7 +52,7 @@ public class Provider {
         }
         Cookie c = null;
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(ForecastConstants.COOKIE_USER_ID)) {
+            if (cookie.getName().equals(Constants.USER_ID)) {
                 c = cookie;
                 break;
             }

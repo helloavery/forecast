@@ -1,13 +1,4 @@
 package com.itavery.forecast.config;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2018-12-11            
- |            
- *===========================================================================*/
 
 import com.authy.AuthyApiClient;
 import com.itavery.forecast.credentials.SecretsRetrieval;
@@ -15,14 +6,19 @@ import com.twilio.http.TwilioRestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.inject.Inject;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-12-11
+ * https://github.com/helloavery
+ */
+
 @Configuration
 public class AuthyConfig {
 
-    private final SecretsRetrieval secretsRetrieval;
-
-    public AuthyConfig(final SecretsRetrieval secretsRetrieval){
-        this.secretsRetrieval = secretsRetrieval;
-    }
+    @Inject
+    private SecretsRetrieval secretsRetrieval;
 
     @Bean
     AuthyApiClient AuthyApiClientInit(){

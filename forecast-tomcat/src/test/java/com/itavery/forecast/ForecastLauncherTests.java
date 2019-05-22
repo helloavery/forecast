@@ -1,18 +1,15 @@
 package com.itavery.forecast;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  3/31/18
- |
- *===========================================================================*/
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-03-31
+ * https://github.com/helloavery
+ */
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -1,16 +1,13 @@
 package com.itavery.forecast.util;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  7/22/18            
- |            
- *===========================================================================*/
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-07-22
+ * https://github.com/helloavery
+ */
 
 public class SerializeUserMain {
 

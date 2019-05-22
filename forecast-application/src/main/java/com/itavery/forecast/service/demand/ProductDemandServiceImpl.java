@@ -1,15 +1,6 @@
 package com.itavery.forecast.service.demand;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  1/30/18
- |
- *===========================================================================*/
-
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.demand.ProductDemandDAO;
 import com.itavery.forecast.exceptions.ServiceException;
@@ -25,20 +16,22 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-01-30
+ * https://github.com/helloavery
+ */
+
 @Service
 public class ProductDemandServiceImpl implements ProductDemandService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductDemandServiceImpl.class);
-    private final AuditService auditService;
-    private final ProductDemandDAO productDemandDAO;
-    private ProductDemandValidator productDemandValidator;
-
     @Inject
-    public ProductDemandServiceImpl(final AuditService auditService, final ProductDemandDAO productDemandDAO, ProductDemandValidator productDemandValidator) {
-        this.auditService = auditService;
-        this.productDemandDAO = productDemandDAO;
-        this.productDemandValidator = productDemandValidator;
-    }
+    private AuditService auditService;
+    @Inject
+    private ProductDemandDAO productDemandDAO;
+    @Inject
+    private ProductDemandValidator productDemandValidator;
 
     @Override
     public String addDemandEntry(ProductDemandDTO productDemand, Integer userId) throws ServiceException {
@@ -47,7 +40,7 @@ public class ProductDemandServiceImpl implements ProductDemandService {
             LOGGER.info("Validating product demand entry/entries for user {}", userId);
             productDemandValidator.validate(productDemand);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.DEMAND);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.DEMAND);
             LOGGER.info("Attempting to add product entry for user {}", userId);
             response = productDemandDAO.addDemandEntry(userId, productDemand);
         } catch (Exception e) {
@@ -90,7 +83,7 @@ public class ProductDemandServiceImpl implements ProductDemandService {
             LOGGER.info("Attempting to update demand entries for user {}", userId);
             productDemandDAO.updateDemandEntry(productDemandList, userId);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.DEMAND);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.DEMAND);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Could not update demand entries {}", productDemandList);
@@ -106,7 +99,7 @@ public class ProductDemandServiceImpl implements ProductDemandService {
             LOGGER.info("Attempting to delete demand entry for: " + productDemandId);
             returnMessage = productDemandDAO.removeDemandEntry(productDemandId);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.DEMAND);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.DEMAND);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Could not delete demand entries {}", productDemandId);

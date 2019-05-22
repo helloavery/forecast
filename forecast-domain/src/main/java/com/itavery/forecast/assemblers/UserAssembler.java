@@ -1,18 +1,15 @@
 package com.itavery.forecast.assemblers;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.mithra.user.UsersDB;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.UserDTO;
 import org.springframework.stereotype.Component;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 @Component
 public class UserAssembler {

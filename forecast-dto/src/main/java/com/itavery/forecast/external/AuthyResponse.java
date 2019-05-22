@@ -1,16 +1,13 @@
 package com.itavery.forecast.external;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2018-12-13            
- |            
- *===========================================================================*/
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-12-13
+ * https://github.com/helloavery
+ */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE)

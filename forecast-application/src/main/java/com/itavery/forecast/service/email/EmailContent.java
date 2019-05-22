@@ -1,13 +1,10 @@
 package com.itavery.forecast.service.email;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/19/18            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-19
+ * https://github.com/helloavery
+ */
 
 public interface EmailContent {
     String getEmailContent();

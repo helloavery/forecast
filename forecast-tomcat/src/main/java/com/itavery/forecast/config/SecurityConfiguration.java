@@ -1,14 +1,5 @@
 package com.itavery.forecast.config;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  4/1/18
- |
- *===========================================================================*/
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,15 +10,23 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-04-01
+ * https://github.com/helloavery
+ */
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private final DataSource dataSource;
+    @Inject
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Inject
+    private DataSource dataSource;
 
     @Value("${spring.queries.users-query}")
     private String usersQuery;
@@ -37,11 +36,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Value("${spring.queries.roles-query}")
     private String rolesQuery;
-
-    public SecurityConfiguration(final BCryptPasswordEncoder bCryptPasswordEncoder, final DataSource dataSource) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.dataSource = dataSource;
-    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)

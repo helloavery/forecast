@@ -1,13 +1,4 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/3/18            
- |            
- *===========================================================================*/
 
 import com.gs.fw.common.mithra.bulkloader.BulkLoader;
 import com.gs.fw.common.mithra.bulkloader.BulkLoaderException;
@@ -19,6 +10,12 @@ import com.gs.fw.common.mithra.databasetype.PostgresDatabaseType;
 import java.sql.Connection;
 import java.util.Properties;
 import java.util.TimeZone;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-03
+ * https://github.com/helloavery
+ */
 
 public class ForecastConnectionConfig implements SourcelessConnectionManager {
 

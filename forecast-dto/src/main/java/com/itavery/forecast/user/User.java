@@ -1,17 +1,13 @@
 package com.itavery.forecast.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/18/18
- |
- *===========================================================================*/
-
-
 import java.io.Serializable;
 import java.util.Objects;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-18
+ * https://github.com/helloavery
+ */
 
 public class User implements Serializable {
 

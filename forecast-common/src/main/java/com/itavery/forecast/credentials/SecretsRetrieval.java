@@ -1,33 +1,34 @@
 package com.itavery.forecast.credentials;
 
 import com.itavery.forecast.bootconfig.ProgramArguments;
+import com.itavery.forecast.concurrent.ExecutorServiceBase;
+import com.itavery.forecast.concurrent.SecretRetrievalTask;
 import com.itavery.forecast.external.S3GatewayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * File created by Avery Grimes-Farrow
+ * @author Avery Grimes-Farrow
  * Created on: 2018-12-19
  * https://github.com/helloavery
  */
 
 @Component
-public class SecretsRetrieval implements InitializingBean {
+public class SecretsRetrieval implements InitializingBean{
 
     private static final Logger LOGGER = LogManager.getLogger(SecretsRetrieval.class);
-
-    private final ProgramArguments programArguments;
-    private final S3GatewayService s3GatewayService;
-
-    public SecretsRetrieval(final ProgramArguments programArguments, final S3GatewayService s3GatewayService){
-        this.programArguments = programArguments;
-        this.s3GatewayService = s3GatewayService;
-    }
+    @Inject
+    private ProgramArguments programArguments;
+    @Inject
+    private S3GatewayService s3GatewayService;
+    @Inject
+    private ExecutorServiceBase executorService;
 
     private static String mailgunApiKey;
     private static String authyApiKey;
@@ -38,11 +39,11 @@ public class SecretsRetrieval implements InitializingBean {
 
     @Override
     public void afterPropertiesSet(){
+        Future<String> mailgunFuture = executorService.submit(new SecretRetrievalTask(s3GatewayService,programArguments.getS3bucket(),programArguments.getS3bucketObjectMailgun()));
+        Future<String> authyFuture = executorService.submit(new SecretRetrievalTask(s3GatewayService,programArguments.getS3bucket(),programArguments.getS3bucketObjectAuthy()));
+        Future<String> twilioFuture = executorService.submit(new SecretRetrievalTask(s3GatewayService,programArguments.getS3bucket(),programArguments.getS3bucketObjectTwilio()));
+        Future<String> keyringFuture = executorService.submit(new SecretRetrievalTask(s3GatewayService,programArguments.getS3bucket(),programArguments.getS3bucketObjectKeyring()));
         try{
-            Future<String> mailgunFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectMailgun());
-            Future<String> authyFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectAuthy());
-            Future<String> twilioFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectTwilio());
-            Future<String> keyringFuture = s3GatewayService.retrieveSecrets(programArguments.getS3bucket(),programArguments.getS3bucketObjectKeyring());
             String mailgunSecrets = mailgunFuture.get(5000, TimeUnit.MILLISECONDS);
             String authySecrets = authyFuture.get(5000, TimeUnit.MILLISECONDS);
             String twilioSecrets = twilioFuture.get(5000, TimeUnit.MILLISECONDS);

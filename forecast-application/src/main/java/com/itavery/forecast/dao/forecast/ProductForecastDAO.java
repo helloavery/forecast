@@ -1,19 +1,16 @@
 package com.itavery.forecast.dao.forecast;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/10/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.product.ProductForecast;
 import com.itavery.forecast.product.ProductForecastDTO;
 
 import java.util.List;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-10
+ * https://github.com/helloavery
+ */
 
 public interface ProductForecastDAO {
 

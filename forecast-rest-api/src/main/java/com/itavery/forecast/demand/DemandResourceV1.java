@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -19,13 +20,10 @@ import java.util.List;
 @RequestMapping("v1/productDemand")
 public class DemandResourceV1 {
 
-    private final ProductDemandService productDemandService;
+    @Inject
+    private ProductDemandService productDemandService;
+    @Inject
     private Provider provider;
-
-    public DemandResourceV1(ProductDemandService productDemandService, Provider provider) {
-        this.productDemandService = productDemandService;
-        this.provider = provider;
-    }
 
     @RequestMapping(value = "/entryDetails/{productDemandId}", method = RequestMethod.GET)
     public Response getDemandEntry(@PathVariable("productDemandId") Integer productDemandId) {

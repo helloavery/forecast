@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 /**
- * File created by Avery Grimes-Farrow
+ * @author Avery Grimes-Farrow
  * Created on: 2019-01-10
  * https://github.com/helloavery
  */
@@ -20,11 +21,8 @@ import javax.ws.rs.core.Response;
 @RequestMapping("v1/admin")
 public class AdminResourceV1 {
 
+    @Inject
     private S3GatewayService s3GatewayService;
-
-    public AdminResourceV1(S3GatewayService s3GatewayService){
-        this.s3GatewayService = s3GatewayService;
-    }
 
     @RequestMapping(value = "/uploadSecrets/{bucket}/{bucketObject}", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public Response uploadAppSecrets(@PathVariable("bucket") String bucket, @PathVariable("bucketObject") String bucketObject, @RequestBody String data){

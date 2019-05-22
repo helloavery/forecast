@@ -1,13 +1,4 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.bootconfig.ProgramArguments;
 import com.itavery.forecast.credentials.SecretsRetrieval;
@@ -16,6 +7,11 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 @Configuration
 public class ReladomoModule {

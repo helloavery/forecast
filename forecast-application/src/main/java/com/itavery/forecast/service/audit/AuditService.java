@@ -1,16 +1,13 @@
 package com.itavery.forecast.service.audit;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  6/20/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.product.ProductType;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-06-20
+ * https://github.com/helloavery
+ */
 
 public interface AuditService {
 

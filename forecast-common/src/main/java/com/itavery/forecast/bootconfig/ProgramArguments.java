@@ -1,13 +1,10 @@
 package com.itavery.forecast.bootconfig;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  8/25/18            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-08-25
+ * https://github.com/helloavery
+ */
 
 public class ProgramArguments {
 

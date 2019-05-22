@@ -1,15 +1,6 @@
 package com.itavery.forecast.service.email;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  7/19/18            
- |            
- *===========================================================================*/
 
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.bootconfig.ProgramArguments;
 import com.itavery.forecast.credentials.SecretsRetrieval;
@@ -26,24 +17,28 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-07-19
+ * https://github.com/helloavery
+ */
+
 @Service
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger LOGGER = LogManager.getLogger(EmailServiceImpl.class);
-
-    private AuditService auditService;
-    private final VelocityEngine velocityEngine;
-    private final ProgramArguments programArguments;
-    private final SecretsRetrieval secretsRetrieval;
-
     @Inject
-    public EmailServiceImpl(AuditService auditService, final VelocityEngine velocityEngine, final ProgramArguments programArguments, final SecretsRetrieval secretsRetrieval){
+    private AuditService auditService;
+    @Inject
+    private VelocityEngine velocityEngine;
+    @Inject
+    private ProgramArguments programArguments;
+    @Inject
+    private SecretsRetrieval secretsRetrieval;
+
+    public EmailServiceImpl(){
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        this.auditService = auditService;
-        this.velocityEngine = velocityEngine;
-        this.programArguments = programArguments;
-        this.secretsRetrieval = secretsRetrieval;
     }
 
     @Override
@@ -83,7 +78,7 @@ public class EmailServiceImpl implements EmailService {
         boolean emailEventSuccessful = false;
         try {
             Configuration configuration = new Configuration()
-                    .domain(ForecastConstants.MAILGUN_DOMAIN_NAME)
+                    .domain(Constants.MAILGUN_DOMAIN_NAME)
                     .apiKey(secretsRetrieval.getMailgunApiKey())
                     .from("Do-Not-Reply", "donotreply@forecaster.itavery.com");
             Mail.using(configuration)

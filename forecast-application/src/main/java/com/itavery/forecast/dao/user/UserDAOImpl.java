@@ -1,15 +1,5 @@
 package com.itavery.forecast.dao.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/18/18
- |
- *===========================================================================*/
-
-
 import com.itavery.forecast.OperationResult;
 import com.itavery.forecast.assemblers.UserAssembler;
 import com.itavery.forecast.exceptions.DAOException;
@@ -33,20 +23,20 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-18
+ * https://github.com/helloavery
+ */
 
 @Repository
 public class UserDAOImpl implements UserDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
-
-    private final UserAssembler userAssembler;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Inject
-    public UserDAOImpl(final UserAssembler userAssembler, final BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userAssembler = userAssembler;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    private UserAssembler userAssembler;
+    @Inject
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional

@@ -1,13 +1,10 @@
 package com.itavery.forecast.product;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/8/18            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-08
+ * https://github.com/helloavery
+ */
 
 public enum ProductType {
 

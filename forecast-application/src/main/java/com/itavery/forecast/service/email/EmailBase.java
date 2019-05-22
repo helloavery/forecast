@@ -1,17 +1,14 @@
 package com.itavery.forecast.service.email;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/21/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.InstanceEnvironments;
 
-public abstract class EmailBase {
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-21
+ * https://github.com/helloavery
+ */
+
+abstract class EmailBase {
 
     protected String getForecasterBaseUrl(String environment){
         return InstanceEnvironments.getInstance(environment);

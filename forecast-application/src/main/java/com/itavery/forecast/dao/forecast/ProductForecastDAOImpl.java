@@ -1,14 +1,5 @@
 package com.itavery.forecast.dao.forecast;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  2/10/18
- |
- *===========================================================================*/
-
 import com.itavery.forecast.OperationResult;
 import com.itavery.forecast.assemblers.ForecastAssembler;
 import com.itavery.forecast.exceptions.DAOException;
@@ -26,17 +17,18 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-02-10
+ * https://github.com/helloavery
+ */
+
 @Repository
 public class ProductForecastDAOImpl implements ProductForecastDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductForecastDAOImpl.class);
-
-    private ForecastAssembler forecastAssembler;
-
     @Inject
-    public ProductForecastDAOImpl(ForecastAssembler forecastAssembler) {
-        this.forecastAssembler = forecastAssembler;
-    }
+    private ForecastAssembler forecastAssembler;
 
     @Override
     @Transactional

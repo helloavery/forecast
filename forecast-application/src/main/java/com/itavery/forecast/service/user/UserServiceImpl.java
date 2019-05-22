@@ -1,15 +1,6 @@
 package com.itavery.forecast.service.user;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  1/30/18
- |
- *===========================================================================*/
-
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.SessionManager;
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.user.UserDAO;
@@ -30,30 +21,30 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-30
+ * https://github.com/helloavery
+ */
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
-
-    private SessionManager sessionManager;
-    private final AuditService auditService;
-    private final UserDAO userDAO;
-    private UserValidator userValidator;
-    private EmailService emailService;
-    private VerificationService verificationService;
-    private AuthyService authyService;
-
     @Inject
-    public UserServiceImpl(SessionManager sessionManager, final AuditService auditService, final UserDAO userDAO, UserValidator userValidator, EmailService emailService,
-                           VerificationService verificationService, AuthyService authyService) {
-        this.sessionManager = sessionManager;
-        this.auditService = auditService;
-        this.userDAO = userDAO;
-        this.userValidator = userValidator;
-        this.emailService = emailService;
-        this.verificationService = verificationService;
-        this.authyService = authyService;
-    }
+    private SessionManager sessionManager;
+    @Inject
+    private AuditService auditService;
+    @Inject
+    private UserDAO userDAO;
+    @Inject
+    private UserValidator userValidator;
+    @Inject
+    private EmailService emailService;
+    @Inject
+    private VerificationService verificationService;
+    @Inject
+    private AuthyService authyService;
 
     @Override
     public UserDTO createUser(HttpServletRequest request, RegistrationDTO registrationDTO) throws ServiceException {
@@ -143,7 +134,7 @@ public class UserServiceImpl implements UserService {
             LOGGER.info("Attempting to update user {}", userId);
             userDAO.updateUser(user);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ACCOUNT_UPDATED, null);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ACCOUNT_UPDATED, null);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Service :Could not create audit event for user update for {}", userId);
@@ -158,7 +149,7 @@ public class UserServiceImpl implements UserService {
         try {
             LOGGER.info("Attempting to deactivate user {}", userId);
             returnMessage = userDAO.deactivateUser(userId);
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ACCOUNT_DEACTIVATED, null);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ACCOUNT_DEACTIVATED, null);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Could not deactivate user {}", userId);

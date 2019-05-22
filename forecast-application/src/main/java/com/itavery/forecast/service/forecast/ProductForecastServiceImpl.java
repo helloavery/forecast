@@ -1,15 +1,6 @@
 package com.itavery.forecast.service.forecast;
 
-/*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  1/30/18
- |
- *===========================================================================*/
-
-import com.itavery.forecast.ForecastConstants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.dao.forecast.ProductForecastDAO;
 import com.itavery.forecast.exceptions.InvalidUserException;
@@ -26,21 +17,22 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-30
+ * https://github.com/helloavery
+ */
+
 @Service
 public class ProductForecastServiceImpl implements ProductForecastService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductForecastServiceImpl.class);
-
-    private final AuditService auditService;
-    private final ProductForecastDAO productForecastDAO;
-    private ProductForecastValidator productForecastValidator;
-
     @Inject
-    public ProductForecastServiceImpl(final AuditService auditService, final ProductForecastDAO productForecastDAO, ProductForecastValidator productForecastValidator) {
-        this.auditService = auditService;
-        this.productForecastDAO = productForecastDAO;
-        this.productForecastValidator = productForecastValidator;
-    }
+    private AuditService auditService;
+    @Inject
+    private ProductForecastDAO productForecastDAO;
+    @Inject
+    private ProductForecastValidator productForecastValidator;
 
     @Override
     public String addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException {
@@ -49,7 +41,7 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             LOGGER.info("Validating forecast entry for user {}", userId);
             productForecastValidator.validate(productForecast);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.FORECAST);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.FORECAST);
 
             LOGGER.info("Attempting to add forecast entry for user {}", userId);
             returnMessage = productForecastDAO.addForecastEntry(userId, productForecast);
@@ -84,7 +76,7 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             LOGGER.info("Attempting to update forecast entries for user{}", userId);
             returnMessage = productForecastDAO.updateForecastEntries(productForecastList, userId);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.FORECAST);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.FORECAST);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Could not update forecast entry for user {}", userId);
@@ -101,7 +93,7 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             LOGGER.info("Attempting to delete forecast entry: " + productForecastId);
             returnMessage = productForecastDAO.deleteForecastEntry(productForecastId);
             //TODO: Implement Audit Service
-            auditService.createAudit(ForecastConstants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.FORECAST);
+            auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.FORECAST);
         } catch (Exception e) {
             if (e.getMessage().contains("Service")) {
                 LOGGER.error("Could not delete product forecast entry {}", productForecastId);

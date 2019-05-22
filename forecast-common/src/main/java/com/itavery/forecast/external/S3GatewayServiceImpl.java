@@ -26,9 +26,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
- * File created by Avery Grimes-Farrow
+ * @author Avery Grimes-Farrow
  * Created on: 2018-12-17
  * https://github.com/helloavery
  */
@@ -37,19 +38,15 @@ import java.util.concurrent.Future;
 public class S3GatewayServiceImpl implements S3GatewayService{
 
     private static final Logger LOGGER = LogManager.getLogger(S3GatewayServiceImpl.class);
-
-    private ExecutorService executor = Executors.newFixedThreadPool(4);
-
+    @Inject
     private ProgramArguments programArguments;
-    private final RestTemplate restTemplate;
+    @Inject
+    private RestTemplate restTemplate;
     private Cipher cipher;
     private KeyGenerator keyGenerator;
     private Signature signature;
 
-    @Inject
-    public S3GatewayServiceImpl(ProgramArguments programArguments, final RestTemplate restTemplate){
-        this.programArguments = programArguments;
-        this.restTemplate = restTemplate;
+    public S3GatewayServiceImpl(){
         setup();
     }
 
@@ -74,27 +71,25 @@ public class S3GatewayServiceImpl implements S3GatewayService{
     }
 
     @Override
-    public Future<String> retrieveSecrets(String bucket, String bucketObject){
+    public String retrieveSecrets(String bucket, String bucketObject){
         try{
-            return executor.submit(() -> {
-                LOGGER.info("Retrieving secrets for bucket {} and object {}", bucket,bucketObject);
-                KeyPair keyPair = generateKeyPair(RSA, 2048);
-                S3GatewayDTO symmetricKeyAndUUID = retrieveS3GatewaySymmetricKey(keyPair.getPublic().getEncoded());
-                SecretKey secretKey = decryptSymmetricKey(symmetricKeyAndUUID.getSymmetricKey(), keyPair.getPrivate());
-                S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, symmetricKeyAndUUID.getSymmetricKeyUUID());
-                S3GatewayDTO s3GatewayResponse = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
-                if(s3GatewayResponse == null){
-                    LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}", bucket,bucketObject);
-                    throw new RuntimeException("Error making call to S3 Gateway Service to retrieve secrets");
-                }
-                PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayResponse.getPublicKey()));
-                byte[] decryptedData = decryptData(s3GatewayResponse.getCipherText(),secretKey);
-                if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayResponse.getSignature())){
-                    LOGGER.error("Error retrieving bucket object {}, signature verification came back as false", bucketObject);
-                    throw new RuntimeException("Error retrieving bucket object, signature verification came back as false");
-                }
-                return new String(decryptedData,StandardCharsets.UTF_8);
-            });
+            LOGGER.info("Retrieving secrets for bucket {} and object {}", bucket,bucketObject);
+            KeyPair keyPair = generateKeyPair(RSA, 2048);
+            S3GatewayDTO symmetricKeyAndUUID = retrieveS3GatewaySymmetricKey(keyPair.getPublic().getEncoded());
+            SecretKey secretKey = decryptSymmetricKey(symmetricKeyAndUUID.getSymmetricKey(), keyPair.getPrivate());
+            S3GatewayDTO s3GatewayRequest = new S3GatewayDTO(bucket, bucketObject, symmetricKeyAndUUID.getSymmetricKeyUUID());
+            S3GatewayDTO s3GatewayResponse = restTemplate.postForObject(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
+            if(s3GatewayResponse == null){
+                LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}", bucket,bucketObject);
+                throw new RuntimeException("Error making call to S3 Gateway Service to retrieve secrets");
+            }
+            PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayResponse.getPublicKey()));
+            byte[] decryptedData = decryptData(s3GatewayResponse.getCipherText(),secretKey);
+            if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayResponse.getSignature())){
+                LOGGER.error("Error retrieving bucket object {}, signature verification came back as false", bucketObject);
+                throw new RuntimeException("Error retrieving bucket object, signature verification came back as false");
+            }
+            return new String(decryptedData,StandardCharsets.UTF_8);
         }
         catch(Exception e){
             LOGGER.error("Error retrieving bucket object {}", bucketObject);

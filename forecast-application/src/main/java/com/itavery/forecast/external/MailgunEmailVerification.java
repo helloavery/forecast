@@ -1,16 +1,12 @@
 package com.itavery.forecast.external;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/1/18            
- |            
- *===========================================================================*/
-
 
 import com.mashape.unirest.http.JsonNode;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-01
+ * https://github.com/helloavery
+ */
 
 public interface MailgunEmailVerification {
 

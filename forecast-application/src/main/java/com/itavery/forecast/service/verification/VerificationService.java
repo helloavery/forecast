@@ -1,13 +1,10 @@
 package com.itavery.forecast.service.verification;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/22/18            
- |            
- *===========================================================================*/
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-22
+ * https://github.com/helloavery
+ */
 
 public interface VerificationService {
 

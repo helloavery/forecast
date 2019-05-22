@@ -1,15 +1,7 @@
 package com.itavery.forecast.config;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  10/9/18            
- |            
- *===========================================================================*/
 
 import com.itavery.forecast.SessionManager;
+import com.itavery.forecast.concurrent.ExecutorServiceBase;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
@@ -37,6 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-10-09
+ * https://github.com/helloavery
+ */
 
 @Configuration
 @Component
@@ -113,5 +111,10 @@ public class AppConfig implements Filter {
     @Bean
     SessionManager sessionManager(){
         return new SessionManager();
+    }
+
+    @Bean
+    ExecutorServiceBase executorServiceBase(){
+        return new ExecutorServiceBase(10);
     }
 }

@@ -1,17 +1,14 @@
 package com.itavery.forecast.mithra;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/5/18            
- |            
- *===========================================================================*/
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-05
+ * https://github.com/helloavery
+ */
 
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)

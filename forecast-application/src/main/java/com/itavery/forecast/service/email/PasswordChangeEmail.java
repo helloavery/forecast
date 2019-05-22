@@ -1,13 +1,4 @@
 package com.itavery.forecast.service.email;
- 
- /*=============================================================================
- |                Forecaster V1.0
- |
- |       File created by: Avery Grimes-Farrow
- |
- |       Created On:  11/19/18            
- |            
- *===========================================================================*/
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +7,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.StringWriter;
+
+/**
+ * @author Avery Grimes-Farrow
+ * Created on: 2018-11-19
+ * https://github.com/helloavery
+ */
 
 public class PasswordChangeEmail extends EmailBase implements EmailContent{
 
