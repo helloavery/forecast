@@ -4,9 +4,9 @@ import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.user.LoginDTO;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.User;
-import com.itavery.forecast.user.UserDTO;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Avery Grimes-Farrow
@@ -16,17 +16,17 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface UserService {
 
-    UserDTO createUser(HttpServletRequest request, RegistrationDTO userDto) throws ServiceException;
+    Response createUser(HttpServletRequest request, RegistrationDTO userDto) throws ServiceException;
 
-    boolean verifyAuthyUser(HttpServletRequest request, String code);
+    Response verifyAuthyUser(HttpServletRequest request, String code);
 
-    boolean login(HttpServletRequest request, LoginDTO user);
+    Response login(HttpServletRequest request, LoginDTO user);
 
-    boolean verifyOtp(HttpServletRequest request, String code);
+    Response verifyOtp(HttpServletRequest request, String code);
 
-    UserDTO findUser(Integer userId) throws ServiceException;
+    Response findUser(Integer userId) throws ServiceException;
 
-    void updateUser(User user, Integer userId) throws ServiceException;
+    Response updateUser(User user, Integer userId) throws ServiceException;
 
-    String deactivateUser(Integer userId) throws ServiceException;
+    Response deactivateUser(Integer userId) throws ServiceException;
 }

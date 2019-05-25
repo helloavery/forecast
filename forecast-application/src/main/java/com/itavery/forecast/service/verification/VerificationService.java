@@ -1,5 +1,8 @@
 package com.itavery.forecast.service.verification;
 
+
+import javax.ws.rs.core.Response;
+
 /**
  * @author Avery Grimes-Farrow
  * Created on: 2018-11-22
@@ -10,5 +13,5 @@ public interface VerificationService {
 
     String generateToken(String email);
 
-    void verifyEmailAddress(String token);
+    Response verifyEmailAddress(String token);
 }

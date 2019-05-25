@@ -4,9 +4,8 @@ import com.authy.AuthyApiClient;
 import com.authy.AuthyException;
 import com.authy.api.Token;
 import com.authy.api.User;
-import com.itavery.forecast.AuthyOtpMethod;
 import com.itavery.forecast.Constants;
-import com.itavery.forecast.SessionManager;
+import com.itavery.forecast.enums.AuthyOtpMethod;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.UserDTO;
 import com.twilio.http.TwilioRestClient;
@@ -23,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Avery Grimes-Farrow
@@ -35,8 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthyServiceImpl implements AuthyService{
 
     private static final Logger LOGGER = LogManager.getLogger(AuthyServiceImpl.class);
-    @Inject
-    private SessionManager sessionManager;
     @Inject
     private AuthyApiClient authyClient;
     @Inject
@@ -99,7 +98,7 @@ public class AuthyServiceImpl implements AuthyService{
                 LOGGER.error("Error retrieving response for Authy OTP via method {} for userId {}", authyOtpMethod, authyId);
                 throw new RuntimeException("Error retrieving response for Authy OTP");
             }
-            sessionManager.partialLogIn(request, userId);
+            partialLogIn(request, userId);
             return authyResponse.getBody().otpSuccessfullySent();
         }
         catch(Exception e){
@@ -138,5 +137,19 @@ public class AuthyServiceImpl implements AuthyService{
                 new PhoneNumber(""),
                 message
         ).create(twilioRestClient);
+    }
+
+    private void partialLogIn(HttpServletRequest request, int userId) {
+        HttpSession oldSession = request.getSession();
+        if(oldSession != null){
+            oldSession.invalidate();
+        }
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute(Constants.PARTIALLY_AUTHENTICATED, true);
+        newSession.setAttribute(Constants.USER_ID, userId);
+        newSession.setMaxInactiveInterval(Constants.MAX_INACTIVE_INTERVAL);
+        Cookie cookie = new Cookie("message", "welcome");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
     }
 }

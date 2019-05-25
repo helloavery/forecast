@@ -1,7 +1,10 @@
 package com.itavery.forecast.dao.user;
 
-import com.itavery.forecast.OperationResult;
 import com.itavery.forecast.assemblers.UserAssembler;
+import com.itavery.forecast.enums.AccountStatusType;
+import com.itavery.forecast.enums.OperationResult;
+import com.itavery.forecast.enums.Regions;
+import com.itavery.forecast.enums.RoleValues;
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.organization.RolesDBFinder;
@@ -10,10 +13,7 @@ import com.itavery.forecast.mithra.user.AccountStatusDB;
 import com.itavery.forecast.mithra.user.AccountStatusDBFinder;
 import com.itavery.forecast.mithra.user.UsersDB;
 import com.itavery.forecast.mithra.user.UsersDBFinder;
-import com.itavery.forecast.regions.Regions;
-import com.itavery.forecast.user.AccountStatusType;
 import com.itavery.forecast.user.RegistrationDTO;
-import com.itavery.forecast.user.RoleValues;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.user.UserDTO;
 import org.apache.logging.log4j.LogManager;

@@ -1,9 +1,9 @@
 package com.itavery.forecast.service.email;
 
 import com.itavery.forecast.Constants;
-import com.itavery.forecast.audit.AuditType;
 import com.itavery.forecast.bootconfig.ProgramArguments;
 import com.itavery.forecast.credentials.SecretsRetrieval;
+import com.itavery.forecast.enums.AuditType;
 import com.itavery.forecast.exceptions.EmailSenderException;
 import com.itavery.forecast.service.audit.AuditService;
 import net.sargue.mailgun.Configuration;
@@ -11,8 +11,6 @@ import net.sargue.mailgun.Mail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

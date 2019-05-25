@@ -1,7 +1,7 @@
 package com.itavery.forecast.config;
 
-import com.itavery.forecast.SessionManager;
 import com.itavery.forecast.concurrent.ExecutorServiceBase;
+import com.itavery.forecast.session.SessionManager;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;

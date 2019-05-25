@@ -1,10 +1,10 @@
 package com.itavery.forecast.dao.audit;
 
-import com.itavery.forecast.audit.AuditType;
+import com.itavery.forecast.enums.AuditType;
+import com.itavery.forecast.enums.ProductType;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.product.AuditTrailProductDB;
 import com.itavery.forecast.mithra.user.AuditTrailDB;
-import com.itavery.forecast.product.ProductType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;

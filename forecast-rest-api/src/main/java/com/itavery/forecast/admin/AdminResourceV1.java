@@ -1,14 +1,20 @@
 package com.itavery.forecast.admin;
 
 import com.itavery.forecast.FileReader;
+import com.itavery.forecast.annotation.EntitlementPolicy;
+import com.itavery.forecast.enums.RoleValues;
 import com.itavery.forecast.external.S3GatewayService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -18,20 +24,29 @@ import javax.ws.rs.core.Response;
  */
 
 @RestController
-@RequestMapping("v1/admin")
+@Path("v1/admin")
 public class AdminResourceV1 {
 
     @Inject
     private S3GatewayService s3GatewayService;
+    @Context
+    HttpServletRequest httpServletRequest;
 
-    @RequestMapping(value = "/uploadSecrets/{bucket}/{bucketObject}", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public Response uploadAppSecrets(@PathVariable("bucket") String bucket, @PathVariable("bucketObject") String bucketObject, @RequestBody String data){
-        s3GatewayService.sendSecrets(bucket, bucketObject, data);
-        return Response.ok().build();
+    @POST
+    @Path("/uploadSecrets/{bucket}/{bucketObject}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @EntitlementPolicy(role = RoleValues.ADMIN)
+    public Response uploadAppSecrets(@PathParam("bucket") String bucket, @PathParam("bucketObject") String bucketObject, String data){
+        return s3GatewayService.sendSecrets(bucket, bucketObject, data);
     }
 
-    @RequestMapping(value = "/uploadSecretsFromFile/{bucket}/{bucketObject}", method = RequestMethod.POST, consumes = {"application/json", "text/plain"}, produces = "application/json")
-    public boolean uploadAppSecretsFromFile(@PathVariable("bucket") String bucket, @PathVariable("bucketObject") String bucketObject, @RequestBody String file){
+    @POST
+    @Path("/uploadSecretsFromFile/{bucket}/{bucketObject}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @EntitlementPolicy(role = RoleValues.ADMIN)
+    public Response uploadAppSecretsFromFile(@PathParam("bucket") String bucket, @PathParam("bucketObject") String bucketObject, String file){
         String data = FileReader.readDataFromFile(file);
         return s3GatewayService.sendSecrets(bucket, bucketObject, data);
     }

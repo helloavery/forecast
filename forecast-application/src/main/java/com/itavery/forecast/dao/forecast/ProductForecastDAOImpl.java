@@ -1,7 +1,7 @@
 package com.itavery.forecast.dao.forecast;
 
-import com.itavery.forecast.OperationResult;
 import com.itavery.forecast.assemblers.ForecastAssembler;
+import com.itavery.forecast.enums.OperationResult;
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.product.ProductForecastDB;

@@ -2,6 +2,7 @@ package com.itavery.forecast.concurrent;
 
 import com.itavery.forecast.external.S3GatewayService;
 
+import javax.ws.rs.core.Response;
 import java.util.concurrent.Callable;
 
 /**
@@ -10,7 +11,7 @@ import java.util.concurrent.Callable;
  * https://github.com/helloavery
  */
 
-public class SecretRetrievalTask implements Callable<String>{
+public class SecretRetrievalTask implements Callable<Response>{
 
     private S3GatewayService s3GatewayService;
     private String bucket;
@@ -23,7 +24,7 @@ public class SecretRetrievalTask implements Callable<String>{
     }
 
     @Override
-    public String call() throws Exception {
+    public Response call() throws Exception {
         return s3GatewayService.retrieveSecrets(bucket, bucketObject);
     }
 }

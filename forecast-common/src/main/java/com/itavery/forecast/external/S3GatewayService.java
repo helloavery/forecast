@@ -1,6 +1,6 @@
 package com.itavery.forecast.external;
 
-import java.util.concurrent.Future;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Avery Grimes-Farrow
@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 
 public interface S3GatewayService {
 
-    String retrieveSecrets(String bucket, String bucketObject);
+    Response retrieveSecrets(String bucket, String bucketObject);
 
-    boolean sendSecrets(String bucket, String bucketObject, String data);
+    Response sendSecrets(String bucket, String bucketObject, String data);
 }

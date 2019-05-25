@@ -1,7 +1,8 @@
 package com.itavery.forecast.service.verification;
 
-import com.itavery.forecast.audit.AuditType;
+import com.itavery.forecast.ResponseBuilder;
 import com.itavery.forecast.dao.verification.VerificationDAO;
+import com.itavery.forecast.enums.AuditType;
 import com.itavery.forecast.external.MailgunEmailVerification;
 import com.itavery.forecast.service.audit.AuditService;
 import com.mashape.unirest.http.JsonNode;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import java.security.SecureRandom;
 
 /**
@@ -28,6 +30,8 @@ public class VerificationServiceImpl implements VerificationService{
     private AuditService auditService;
     @Inject
     private MailgunEmailVerification mailgunEmailVerification;
+    @Inject
+    ResponseBuilder responseBuilder;
 
     public String generateToken(String email){
         try{
@@ -48,32 +52,35 @@ public class VerificationServiceImpl implements VerificationService{
         }
         catch(Exception e){
             LOGGER.error("Error generating token for email {}", email);
-            throw new RuntimeException("Error generating token for email " + email, e);
+            throw new RuntimeException("Error generating token for email " + email);
         }
     }
 
 
-    public void verifyEmailAddress(String token){
+    public Response verifyEmailAddress(String token){
         try{
             String email = verificationDAO.retrieveEmail(token);
             if(email == null){
                 LOGGER.error("Email could not be found for token {}", token);
-                throw new NullPointerException("");
+                return responseBuilder.createFailureResponse(Response.Status.BAD_REQUEST,  "");
             }
             JsonNode emailValidationResponse = mailgunEmailVerification.validateEmail(email);
             boolean isDisposableAddress = (boolean) emailValidationResponse.getObject().get("is_disposable_address");
             boolean isValid = (boolean) emailValidationResponse.getObject().get("is_valid");
             if(!isDisposableAddress && isValid){
-                verificationDAO.updateAccountStatus(email);
+                String result = verificationDAO.updateAccountStatus(email);
                 auditService.createAudit(email, AuditType.EMAIL_VERIFIED, null);
+                return responseBuilder.createSuccessResponse(result);
+
             }
             else{
                 LOGGER.info("E-mail address {} is not valid", email);
+                return responseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "E-mail address is not valid");
             }
         }
         catch(Exception e){
             LOGGER.error("Error verifying email address for token {}", token);
-            throw new RuntimeException("Error verifying email address for token " + token, e);
+            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, "Error verifying email address for token " + token);
         }
     }
 }

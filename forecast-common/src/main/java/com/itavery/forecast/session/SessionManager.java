@@ -1,4 +1,6 @@
-package com.itavery.forecast;
+package com.itavery.forecast.session;
+
+import com.itavery.forecast.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -10,15 +12,6 @@ import javax.servlet.http.HttpSession;
  */
 
 public class SessionManager {
-
-    private static final int MAX_INACTIVE_INTERVAL = 30 * 60;
-
-    public void partialLogIn(HttpServletRequest request, int userId) {
-        HttpSession session = request.getSession();
-        session.setAttribute(Constants.PARTIALLY_AUTHENTICATED, true);
-        session.setAttribute(Constants.USER_ID, userId);
-        session.setMaxInactiveInterval(MAX_INACTIVE_INTERVAL);
-    }
 
     public int getLoggedUserId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);

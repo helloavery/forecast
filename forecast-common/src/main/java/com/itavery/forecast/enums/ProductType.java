@@ -1,4 +1,4 @@
-package com.itavery.forecast.product;
+package com.itavery.forecast.enums;
 
 /**
  * @author Avery Grimes-Farrow

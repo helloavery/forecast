@@ -1,13 +1,13 @@
 package com.itavery.forecast.service.forecast;
 
 import com.itavery.forecast.Constants;
-import com.itavery.forecast.audit.AuditType;
+import com.itavery.forecast.ResponseBuilder;
 import com.itavery.forecast.dao.forecast.ProductForecastDAO;
-import com.itavery.forecast.exceptions.InvalidUserException;
+import com.itavery.forecast.enums.AuditType;
+import com.itavery.forecast.enums.ProductType;
 import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.product.ProductForecast;
 import com.itavery.forecast.product.ProductForecastDTO;
-import com.itavery.forecast.product.ProductType;
 import com.itavery.forecast.service.audit.AuditService;
 import com.itavery.forecast.validator.ProductForecastValidator;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -33,9 +34,11 @@ public class ProductForecastServiceImpl implements ProductForecastService {
     private ProductForecastDAO productForecastDAO;
     @Inject
     private ProductForecastValidator productForecastValidator;
+    @Inject
+    ResponseBuilder responseBuilder;
 
     @Override
-    public String addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException {
+    public Response addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException {
         String returnMessage = null;
         try {
             LOGGER.info("Validating forecast entry for user {}", userId);
@@ -45,61 +48,56 @@ public class ProductForecastServiceImpl implements ProductForecastService {
 
             LOGGER.info("Attempting to add forecast entry for user {}", userId);
             returnMessage = productForecastDAO.addForecastEntry(userId, productForecast);
+            return responseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
-            if (e.getMessage().contains("Service")) {
-                LOGGER.error("Could not add forecast entry for user {}", userId);
-                LOGGER.error(e.getMessage(), e);
-            }
+            LOGGER.error("Could not add forecast entry for user {}", userId);
+            LOGGER.error(e.getMessage(), e);
+            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_ADDING_ENTRY);
         }
-        return returnMessage;
     }
 
     @Override
-    public List<ProductForecastDTO> getForecastEntries(Integer userId) throws ServiceException {
+    public Response getForecastEntries(Integer userId) throws ServiceException {
         LOGGER.info("Attempting to get forecast entries for user {}", userId);
         List<ProductForecastDTO> productForecastDtoList = productForecastDAO.getForecastEntries(userId);
         if (productForecastDtoList.isEmpty()) {
-            throw new InvalidUserException("Service.USER_NOT_FOUND");
+            return responseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         } else {
-            return productForecastDtoList;
+            return responseBuilder.createSuccessResponse(productForecastDtoList);
         }
     }
 
     @Override
-    public String updateForecastEntries(List<ProductForecast> productForecastList, Integer userId) throws ServiceException {
-        String returnMessage = null;
+    public Response updateForecastEntries(List<ProductForecast> productForecastList, Integer userId) throws ServiceException {
         try {
             for (ProductForecast productForecast : productForecastList) {
                 LOGGER.info("Validating entries for forecast id {}", productForecast.getProductForecastId());
                 productForecastValidator.validate(productForecast);
             }
             LOGGER.info("Attempting to update forecast entries for user{}", userId);
-            returnMessage = productForecastDAO.updateForecastEntries(productForecastList, userId);
+            String returnMessage = productForecastDAO.updateForecastEntries(productForecastList, userId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.FORECAST);
+            return responseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
-            if (e.getMessage().contains("Service")) {
-                LOGGER.error("Could not update forecast entry for user {}", userId);
-                LOGGER.error(e.getMessage(), e);
-            }
+            LOGGER.error("Could not update forecast entry for user {}", userId);
+            LOGGER.error(e.getMessage(), e);
+            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
         }
-        return returnMessage;
     }
 
     @Override
-    public String deleteForecastEntry(List<Integer> productForecastId, Integer userId) throws ServiceException {
-        String returnMessage = null;
+    public Response deleteForecastEntry(List<Integer> productForecastId, Integer userId) throws ServiceException {
         try {
             LOGGER.info("Attempting to delete forecast entry: " + productForecastId);
-            returnMessage = productForecastDAO.deleteForecastEntry(productForecastId);
+            String returnMessage = productForecastDAO.deleteForecastEntry(productForecastId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.FORECAST);
+            return responseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
-            if (e.getMessage().contains("Service")) {
-                LOGGER.error("Could not delete product forecast entry {}", productForecastId);
-                LOGGER.error(e.getMessage(), e);
-            }
+            LOGGER.error("Could not delete product forecast entry {}", productForecastId);
+            LOGGER.error(e.getMessage(), e);
+            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_DELETING_ENTRY);
         }
-        return returnMessage;
     }
 }

@@ -1,5 +1,6 @@
-package com.itavery.forecast;
+package com.itavery.forecast.session;
 
+import com.itavery.forecast.Constants;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;

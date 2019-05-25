@@ -1,13 +1,13 @@
 package com.itavery.forecast.dao.verification;
 
-import com.itavery.forecast.OperationResult;
+import com.itavery.forecast.enums.AccountStatusType;
+import com.itavery.forecast.enums.OperationResult;
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.user.AccountStatusDB;
 import com.itavery.forecast.mithra.user.AccountStatusDBFinder;
 import com.itavery.forecast.mithra.user.EmailTokenDB;
 import com.itavery.forecast.mithra.user.EmailTokenDBFinder;
-import com.itavery.forecast.user.AccountStatusType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
