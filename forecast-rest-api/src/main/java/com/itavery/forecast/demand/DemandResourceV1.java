@@ -3,7 +3,7 @@ package com.itavery.forecast.demand;
 import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;
 import com.itavery.forecast.service.demand.ProductDemandService;
-import com.itavery.forecast.session.Provider;
+import com.itavery.forecast.session.SessionManager;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
@@ -27,7 +27,7 @@ public class DemandResourceV1 {
     @Inject
     private ProductDemandService productDemandService;
     @Inject
-    private Provider provider;
+    private SessionManager sessionManager;
 
     @GET
     @Path("/entryDetails/{productDemandId}")
@@ -40,7 +40,7 @@ public class DemandResourceV1 {
     @Path("/entryDetails")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserDemandEntries(@Context HttpServletRequest request) {
-        Integer userId = provider.getUserId(request);
+        Integer userId = sessionManager.getLoggedUserId(request);
         return productDemandService.getUserDemandEntries(userId);
     }
 
@@ -49,7 +49,7 @@ public class DemandResourceV1 {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addDemandEntry(@Context HttpServletRequest request, ProductDemandDTO productDemand) {
-        Integer userId = provider.getUserId(request);
+        Integer userId = sessionManager.getLoggedUserId(request);
         return productDemandService.addDemandEntry(productDemand, userId);
     }
 
@@ -58,7 +58,7 @@ public class DemandResourceV1 {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateDemandEntry(@Context HttpServletRequest request, List<ProductDemand> productDemandList) {
-        Integer userId = provider.getUserId(request);
+        Integer userId = sessionManager.getLoggedUserId(request);
         return productDemandService.updateDemandEntry(productDemandList, userId);
     }
 
@@ -67,7 +67,7 @@ public class DemandResourceV1 {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDemandEntry(@Context HttpServletRequest request, @PathParam("productDemandId") List<Integer> productDemandId) {
-        Integer userId = provider.getUserId(request);
+        Integer userId = sessionManager.getLoggedUserId(request);
         return productDemandService.removeDemandEntry(productDemandId, userId);
     }
 }

@@ -1,7 +1,7 @@
 package com.itavery.forecast.user;
 
 import com.itavery.forecast.service.user.UserService;
-import com.itavery.forecast.session.Provider;
+import com.itavery.forecast.session.SessionManager;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +28,7 @@ public class UserResourceV1 {
     @Inject
     private UserService userService;
     @Inject
-    private Provider provider;
+    private SessionManager sessionManager;
 
     @POST
     @Path("/create")
@@ -72,7 +72,7 @@ public class UserResourceV1 {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@Context HttpServletRequest request, User user) {
-        Integer userId = provider.getUserId(request);
+        Integer userId = sessionManager.getLoggedUserId(request);
         return userService.updateUser(user, userId);
     }
 
