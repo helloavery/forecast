@@ -1,6 +1,6 @@
 package com.itavery.forecast.service.entitlement;
 
-import com.itavery.forecast.enums.RoleValues;
+import com.itavery.forecast.constants.RoleValues;
 import com.itavery.forecast.exceptions.InvalidEntitlementException;
 
 /**

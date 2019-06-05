@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @RestController
-@Path("v1/verification/verify_email")
+@Path("/v1/verification/verify_email")
 public class VerificationResourceV1 {
 
     @Inject

@@ -2,9 +2,9 @@ package com.itavery.forecast.admin;
 
 import com.itavery.forecast.FileReader;
 import com.itavery.forecast.annotation.EntitlementPolicy;
-import com.itavery.forecast.enums.RoleValues;
+import com.itavery.forecast.constants.RoleValues;
 import com.itavery.forecast.external.S3GatewayService;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +23,8 @@ import javax.ws.rs.core.Response;
  * https://github.com/helloavery
  */
 
-@RestController
-@Path("v1/admin")
+@Component
+@Path("/v1/admin")
 public class AdminResourceV1 {
 
     @Inject

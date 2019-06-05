@@ -1,10 +1,10 @@
 package com.itavery.forecast.external;
 
 import com.google.common.base.Stopwatch;
-import com.itavery.forecast.Constants;
 import com.itavery.forecast.ResponseBuilder;
 import com.itavery.forecast.S3GatewayDTO;
 import com.itavery.forecast.bootconfig.ProgramArguments;
+import com.itavery.forecast.constants.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -75,7 +75,7 @@ public class S3GatewayServiceImpl<T> implements S3GatewayService{
     }
 
     @Override
-    public Response retrieveSecrets(String bucket, String bucketObject){
+    public String retrieveSecrets(String bucket, String bucketObject){
         try{
             LOGGER.info("Retrieving secrets for bucket {} and object {}", bucket,bucketObject);
             KeyPair keyPair = generateKeyPair(RSA, 2048);
@@ -86,23 +86,20 @@ public class S3GatewayServiceImpl<T> implements S3GatewayService{
             ResponseEntity<S3GatewayDTO> s3GatewayResponse = restTemplate.exchange(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, HttpMethod.POST, request, S3GatewayDTO.class);
             if(s3GatewayResponse.getStatusCodeValue() != 200){
                 LOGGER.error("Error making call to S3 Gateway Service to retrieve secrets for bucket {} and object {}, error {}", bucket,bucketObject, s3GatewayResponse.getStatusCodeValue());
-                return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_S3_GATEWAY_ERROR);
+                throw new RuntimeException("Error with communicating with S3 Gateway");
             }
-            ResponseEntity<?> response = sendS3GatewayRequest(programArguments.getS3gatewayendpoint() + RETRIEVE_BUCKET_OBJECT, s3GatewayRequest, S3GatewayDTO.class);
-            S3GatewayDTO body = (S3GatewayDTO) response.getBody();
-
             S3GatewayDTO s3GatewayDTOBody = s3GatewayResponse.getBody();
             PublicKey decodedPublicKey = KeyFactory.getInstance(RSA).generatePublic(new X509EncodedKeySpec(s3GatewayDTOBody.getPublicKey()));
             byte[] decryptedData = decryptData(s3GatewayDTOBody.getCipherText(),secretKey);
             if(!verifySignature(decodedPublicKey,decryptedData,s3GatewayDTOBody.getSignature())){
                 LOGGER.error("Error retrieving bucket object {}, signature verification came back as false", bucketObject);
-                return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_S3_GATEWAY_BUCKET_RETRIEVAL_ERROR);
+                throw new RuntimeException("Error fetching bucket, signature verification came back as false");
             }
-            return responseBuilder.createSuccessResponse(new String(decryptedData,StandardCharsets.UTF_8));
+            return new String(decryptedData,StandardCharsets.UTF_8);
         }
         catch(Exception e){
             LOGGER.error("Error retrieving bucket object {}", bucketObject);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_S3_GATEWAY_BUCKET_RETRIEVAL_ERROR);
+            throw new RuntimeException("Error fetching bucket");
         }
     }
 
@@ -129,14 +126,6 @@ public class S3GatewayServiceImpl<T> implements S3GatewayService{
             LOGGER.error("Error sending bucket object {}", bucketObject);
             return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_S3_GATEWAY_BUCKET_SEND_ERROR);
         }
-    }
-
-    private ResponseEntity<?> sendS3GatewayRequest(String endpoint, Object request, Class<?> clazz){
-        ResponseEntity<?> response = restTemplate.postForEntity(endpoint, request, clazz);
-        if(response.getStatusCodeValue() != 200){
-
-        }
-        return response;
     }
 
     private S3GatewayDTO retrieveS3GatewaySymmetricKey(byte[] publicKey){

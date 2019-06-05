@@ -1,10 +1,10 @@
 package com.itavery.forecast.service.demand;
 
-import com.itavery.forecast.Constants;
 import com.itavery.forecast.ResponseBuilder;
+import com.itavery.forecast.constants.AuditType;
+import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.constants.ProductType;
 import com.itavery.forecast.dao.demand.ProductDemandDAO;
-import com.itavery.forecast.enums.AuditType;
-import com.itavery.forecast.enums.ProductType;
 import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;

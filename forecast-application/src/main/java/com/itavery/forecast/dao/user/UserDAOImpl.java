@@ -1,10 +1,10 @@
 package com.itavery.forecast.dao.user;
 
 import com.itavery.forecast.assemblers.UserAssembler;
-import com.itavery.forecast.enums.AccountStatusType;
-import com.itavery.forecast.enums.OperationResult;
-import com.itavery.forecast.enums.Regions;
-import com.itavery.forecast.enums.RoleValues;
+import com.itavery.forecast.constants.AccountStatusType;
+import com.itavery.forecast.constants.OperationResult;
+import com.itavery.forecast.constants.Regions;
+import com.itavery.forecast.constants.RoleValues;
 import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.organization.RolesDBFinder;

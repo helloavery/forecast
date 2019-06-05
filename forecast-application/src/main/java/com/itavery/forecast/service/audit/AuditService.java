@@ -1,7 +1,7 @@
 package com.itavery.forecast.service.audit;
 
-import com.itavery.forecast.enums.AuditType;
-import com.itavery.forecast.enums.ProductType;
+import com.itavery.forecast.constants.AuditType;
+import com.itavery.forecast.constants.ProductType;
 
 /**
  * @author Avery Grimes-Farrow

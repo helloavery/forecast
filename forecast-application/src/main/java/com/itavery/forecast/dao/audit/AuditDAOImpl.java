@@ -1,7 +1,7 @@
 package com.itavery.forecast.dao.audit;
 
-import com.itavery.forecast.enums.AuditType;
-import com.itavery.forecast.enums.ProductType;
+import com.itavery.forecast.constants.AuditType;
+import com.itavery.forecast.constants.ProductType;
 import com.itavery.forecast.mithra.annotation.Transactional;
 import com.itavery.forecast.mithra.product.AuditTrailProductDB;
 import com.itavery.forecast.mithra.user.AuditTrailDB;

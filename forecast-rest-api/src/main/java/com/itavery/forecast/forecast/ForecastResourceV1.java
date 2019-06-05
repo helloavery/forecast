@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @RestController
-@Path("v1/productForecast")
+@Path("/v1/productForecast")
 public class ForecastResourceV1 {
 
     @Inject

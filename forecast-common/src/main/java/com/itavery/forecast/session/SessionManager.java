@@ -1,6 +1,6 @@
 package com.itavery.forecast.session;
 
-import com.itavery.forecast.Constants;
+import com.itavery.forecast.constants.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

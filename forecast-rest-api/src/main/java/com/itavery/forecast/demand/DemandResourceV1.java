@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @RestController
-@Path("v1/productDemand")
+@Path("/v1/productDemand")
 public class DemandResourceV1 {
 
     @Inject

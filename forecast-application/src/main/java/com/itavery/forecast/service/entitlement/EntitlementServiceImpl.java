@@ -1,7 +1,7 @@
 package com.itavery.forecast.service.entitlement;
 
+import com.itavery.forecast.constants.RoleValues;
 import com.itavery.forecast.dao.entitlement.EntitlementDAO;
-import com.itavery.forecast.enums.RoleValues;
 import com.itavery.forecast.exceptions.InvalidEntitlementException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

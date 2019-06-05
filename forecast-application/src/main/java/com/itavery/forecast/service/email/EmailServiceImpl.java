@@ -1,9 +1,9 @@
 package com.itavery.forecast.service.email;
 
-import com.itavery.forecast.Constants;
 import com.itavery.forecast.bootconfig.ProgramArguments;
+import com.itavery.forecast.constants.AuditType;
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.credentials.SecretsRetrieval;
-import com.itavery.forecast.enums.AuditType;
 import com.itavery.forecast.exceptions.EmailSenderException;
 import com.itavery.forecast.service.audit.AuditService;
 import net.sargue.mailgun.Configuration;

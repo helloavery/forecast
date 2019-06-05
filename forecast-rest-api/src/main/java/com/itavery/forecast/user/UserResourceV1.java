@@ -21,7 +21,7 @@ import java.security.Principal;
 import java.util.Base64;
 
 @RestController
-@Path("v1/users")
+@Path("/v1/users")
 @CrossOrigin
 public class UserResourceV1 {
 

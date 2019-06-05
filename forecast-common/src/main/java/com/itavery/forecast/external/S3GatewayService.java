@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 
 public interface S3GatewayService {
 
-    Response retrieveSecrets(String bucket, String bucketObject);
+    String retrieveSecrets(String bucket, String bucketObject);
 
     Response sendSecrets(String bucket, String bucketObject, String data);
 }

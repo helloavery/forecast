@@ -1,6 +1,6 @@
 package com.itavery.forecast.service.email;
 
-import com.itavery.forecast.Constants;
+import com.itavery.forecast.constants.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;

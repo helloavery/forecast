@@ -1,17 +1,19 @@
 package com.itavery.forecast.annotation;
 
-import com.itavery.forecast.enums.RoleValues;
-import com.itavery.forecast.exceptions.InvalidEntitlementException;
+import com.itavery.forecast.constants.RoleValues;
 import com.itavery.forecast.exceptions.ValidateEntitlementException;
 import com.itavery.forecast.service.entitlement.EntitlementService;
 import com.itavery.forecast.session.SessionManager;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
 
 /**
  * @author Avery Grimes-Farrow
@@ -19,7 +21,8 @@ import java.lang.reflect.Method;
  * https://github.com/helloavery
  */
 
-public class ValidateEntitlement {
+@Priority(Priorities.AUTHORIZATION)
+public class ValidateEntitlement implements ContainerRequestFilter {
 
     @Inject
     private SessionManager sessionManager;
@@ -27,45 +30,21 @@ public class ValidateEntitlement {
     private EntitlementService entitlementService;
     @Context
     HttpServletRequest request;
+    @Context
+    ResourceInfo resourceInfo;
 
-    public void checkUserEntitlement(Object object) throws InvalidEntitlementException, ValidateEntitlementException {
-        try {
-            initializeObject(object);
-            checkEntitlement(object);
-
-        } catch (Exception e) {
-            throw new ValidateEntitlementException(e.getMessage());
-        }
-    }
-
-    private void initializeObject(Object object) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Class<?> clazz = object.getClass();
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(EntitlementPolicy.class)) {
-                method.setAccessible(true);
-                method.invoke(object);
-            }
-        }
-    }
-
-    private RoleValues getRoleValue(Field field) {
-        return field.getAnnotation(EntitlementPolicy.class).role();
-    }
-
-    private void checkEntitlement(Object object){
-        RoleValues roleValue = null;
-        int userId = sessionManager.getLoggedUserId(request);
-        Class<?> clazz = object.getClass();
-        for(Field field : clazz.getDeclaredFields()){
-            field.setAccessible(true);
-            if(field.isAnnotationPresent(EntitlementPolicy.class)){
-                roleValue  =  getRoleValue(field);
-            }
-        }
-        if(roleValue == null){
+    @Override
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+        EntitlementPolicy entitlementPolicy = resourceInfo.getResourceMethod().getAnnotation(EntitlementPolicy.class);
+        if(entitlementPolicy == null){
             throw new ValidateEntitlementException("Role to validate is missing");
         }
-        entitlementService.matchEntitlementAgainstUser(userId, roleValue);
+        RoleValues roleValue = entitlementPolicy.role();
+        checkEntitlement(roleValue);
     }
 
+    private void checkEntitlement(RoleValues roleValue){
+        int userId = sessionManager.getLoggedUserId(request);
+        entitlementService.matchEntitlementAgainstUser(userId, roleValue);
+    }
 }

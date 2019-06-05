@@ -1,6 +1,6 @@
 package com.itavery.forecast.external;
 
-import com.itavery.forecast.Constants;
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.credentials.SecretsRetrieval;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;

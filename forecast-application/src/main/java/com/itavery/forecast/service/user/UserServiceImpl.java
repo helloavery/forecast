@@ -1,9 +1,9 @@
 package com.itavery.forecast.service.user;
 
-import com.itavery.forecast.Constants;
 import com.itavery.forecast.ResponseBuilder;
+import com.itavery.forecast.constants.AuditType;
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.dao.user.UserDAO;
-import com.itavery.forecast.enums.AuditType;
 import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.external.AuthyService;
 import com.itavery.forecast.service.audit.AuditService;

@@ -1,4 +1,4 @@
-package com.itavery.forecast;
+package com.itavery.forecast.constants;
 
 /**
  * @author Avery Grimes-Farrow
@@ -53,5 +53,8 @@ public interface Constants {
     String SERVICE_S3_GATEWAY_ERROR = "Error with communicating with S3 Gateway";
     String SERVICE_S3_GATEWAY_BUCKET_RETRIEVAL_ERROR = "Error fetching bucket";
     String SERVICE_S3_GATEWAY_BUCKET_SEND_ERROR = "Error sending bucket";
+
+    /***Spring Config Constants***/
+    String API_ROOT = "/rest/*";
 
 }

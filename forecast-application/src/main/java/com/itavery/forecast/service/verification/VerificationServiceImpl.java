@@ -1,8 +1,8 @@
 package com.itavery.forecast.service.verification;
 
 import com.itavery.forecast.ResponseBuilder;
+import com.itavery.forecast.constants.AuditType;
 import com.itavery.forecast.dao.verification.VerificationDAO;
-import com.itavery.forecast.enums.AuditType;
 import com.itavery.forecast.external.MailgunEmailVerification;
 import com.itavery.forecast.service.audit.AuditService;
 import com.mashape.unirest.http.JsonNode;

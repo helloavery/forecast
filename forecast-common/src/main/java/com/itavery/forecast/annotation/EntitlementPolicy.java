@@ -1,6 +1,6 @@
 package com.itavery.forecast.annotation;
 
-import com.itavery.forecast.enums.RoleValues;
+import com.itavery.forecast.constants.RoleValues;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

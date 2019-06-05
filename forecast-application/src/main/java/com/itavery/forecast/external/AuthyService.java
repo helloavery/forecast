@@ -1,7 +1,7 @@
 package com.itavery.forecast.external;
 
 import com.authy.AuthyException;
-import com.itavery.forecast.enums.AuthyOtpMethod;
+import com.itavery.forecast.constants.AuthyOtpMethod;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.UserDTO;
 
