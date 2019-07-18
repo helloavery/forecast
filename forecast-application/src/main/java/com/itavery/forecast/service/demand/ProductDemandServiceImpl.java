@@ -28,14 +28,24 @@ import java.util.List;
 public class ProductDemandServiceImpl implements ProductDemandService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductDemandServiceImpl.class);
-    @Inject
     private AuditService auditService;
-    @Inject
     private ProductDemandDAO productDemandDAO;
-    @Inject
     private ProductDemandValidator productDemandValidator;
+
     @Inject
-    ResponseBuilder responseBuilder;
+    public ProductDemandServiceImpl(ProductDemandDAO productDemandDAO){
+        this.productDemandDAO = productDemandDAO;
+    }
+
+    @Inject
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+
+    @Inject
+    public void setProductDemandValidator(ProductDemandValidator productDemandValidator) {
+        this.productDemandValidator = productDemandValidator;
+    }
 
     @Override
     public Response addDemandEntry(ProductDemandDTO productDemand, Integer userId) throws ServiceException {
@@ -46,11 +56,11 @@ public class ProductDemandServiceImpl implements ProductDemandService {
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.DEMAND);
             LOGGER.info("Attempting to add product entry for user {}", userId);
             String result = productDemandDAO.addDemandEntry(userId, productDemand);
-            return responseBuilder.createSuccessResponse(result);
+            return ResponseBuilder.createSuccessResponse(result);
         } catch (Exception e) {
             LOGGER.error("Could not add demand entry for user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_ADDING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_ADDING_ENTRY);
         }
     }
 
@@ -60,9 +70,9 @@ public class ProductDemandServiceImpl implements ProductDemandService {
         ProductDemandDTO productDemandDto = productDemandDAO.getDemandEntry(productDemandId);
         if (productDemandDto == null) {
             LOGGER.error("Could not get demand entry for user: " + productDemandId);
-            return responseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_ENTRY_NOT_FOUND);
+            return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_ENTRY_NOT_FOUND);
         }
-        return responseBuilder.createSuccessResponse(productDemandDto);
+        return ResponseBuilder.createSuccessResponse(productDemandDto);
     }
 
     @Override
@@ -71,9 +81,9 @@ public class ProductDemandServiceImpl implements ProductDemandService {
         List<ProductDemandDTO> productDemandDtoList = productDemandDAO.getUserDemandEntries(userId);
         if (productDemandDtoList.isEmpty()) {
             LOGGER.error("Could not get demand entries for user: " + userId);
-            return responseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
+            return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         }
-        return responseBuilder.createSuccessResponse(productDemandDtoList);
+        return ResponseBuilder.createSuccessResponse(productDemandDtoList);
     }
 
     @Override
@@ -86,27 +96,26 @@ public class ProductDemandServiceImpl implements ProductDemandService {
             productDemandDAO.updateDemandEntry(productDemandList, userId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.DEMAND);
-            return responseBuilder.createSuccessResponse();
+            return ResponseBuilder.createSuccessResponse();
         } catch (Exception e) {
             LOGGER.error("Could not update demand entries {}", productDemandList);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
         }
     }
 
     @Override
     public Response removeDemandEntry(List<Integer> productDemandId, Integer userId) throws ServiceException {
-        String returnMessage = null;
         try {
             LOGGER.info("Attempting to delete demand entry for: " + productDemandId);
-            returnMessage = productDemandDAO.removeDemandEntry(productDemandId);
+            String returnMessage = productDemandDAO.removeDemandEntry(productDemandId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.DEMAND);
-            return responseBuilder.createSuccessResponse(returnMessage);
+            return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not delete demand entries {}", productDemandId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
         }
     }
 }

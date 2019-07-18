@@ -1,14 +1,15 @@
 package com.itavery.forecast.dao.forecast;
 
-import com.itavery.forecast.assemblers.ForecastAssembler;
-import com.itavery.forecast.constants.OperationResult;
+import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.domain.assemblers.ForecastAssembler;
+import com.itavery.forecast.domain.mithra.annotation.Transactional;
+import com.itavery.forecast.domain.mithra.product.ProductForecastDB;
+import com.itavery.forecast.domain.mithra.product.ProductForecastDBFinder;
+import com.itavery.forecast.domain.mithra.product.ProductForecastDBList;
 import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.mithra.annotation.Transactional;
-import com.itavery.forecast.mithra.product.ProductForecastDB;
-import com.itavery.forecast.mithra.product.ProductForecastDBFinder;
-import com.itavery.forecast.mithra.product.ProductForecastDBList;
 import com.itavery.forecast.product.ProductForecast;
 import com.itavery.forecast.product.ProductForecastDTO;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -24,11 +25,15 @@ import java.util.List;
  */
 
 @Repository
-public class ProductForecastDAOImpl implements ProductForecastDAO {
+public class ProductForecastDAOImpl implements ProductForecastDAO, Constants {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductForecastDAOImpl.class);
-    @Inject
     private ForecastAssembler forecastAssembler;
+
+    @Inject
+    public void setForecastAssembler(ForecastAssembler forecastAssembler) {
+        this.forecastAssembler = forecastAssembler;
+    }
 
     @Override
     @Transactional
@@ -39,11 +44,11 @@ public class ProductForecastDAOImpl implements ProductForecastDAO {
             LOGGER.info("Adding forecast entry for userId {}", userId);
             productForecastDB.setUserId(userId);
             productForecastDB.cascadeInsert();
-            return OperationResult.PRODUCT_FORECAST_ADD_ENTRY_SUCCESS.getMessage();
+            return PRODUCT_FORECAST_ADD_ENTRY_SUCCESS;
         } catch (DAOException e) {
             LOGGER.error("Could not add forecast entry/entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Forecast DAO Error: Could not add entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Forecast DAO Error: Could not add entry");
         }
     }
 
@@ -65,7 +70,7 @@ public class ProductForecastDAOImpl implements ProductForecastDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not get forecast entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Forecast DAO Error: Could not get forecast entries");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Forecast DAO Error: Could not get forecast entries");
         }
         return productForecastDtoList;
     }
@@ -104,12 +109,12 @@ public class ProductForecastDAOImpl implements ProductForecastDAO {
                 productForecastDB.setUserId(userId);
                 LOGGER.info("Updated forecast entry {}", productForecast.getProductForecastId());
             }
-            returnMessage = OperationResult.PRODUCT_FORECAST_SUCCESSFUL_UPDATE.getMessage();
+            returnMessage = PRODUCT_FORECAST_SUCCESSFUL_UPDATE;
             LOGGER.info("updated demand entries for user {}", userId);
         } catch (DAOException e) {
             LOGGER.error("Could not update forecast entries for forecast id {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Forecast DAO Error: Could not update forecast entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Product Forecast DAO Error: Could not update forecast entry");
         }
         return returnMessage;
     }
@@ -128,11 +133,11 @@ public class ProductForecastDAOImpl implements ProductForecastDAO {
                     productForecastDB.terminate();
                 }
             }
-            returnMessage = OperationResult.PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL.getMessage();
+            returnMessage = PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
         } catch (DAOException e) {
             LOGGER.error("Could not delete forecast entry for forecast entry {}", productForecastId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Forecast DAO Error: Could not remove delete entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Product Forecast DAO Error: Could not remove delete entry");
         }
         return returnMessage;
     }

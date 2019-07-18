@@ -21,6 +21,9 @@ public class ProgramArguments {
     private String showSql = "true";
     private String sessionContextClass = "thread";
     private String environment;
+    private String authyClientBasePath;
+    private String mailgunClientBasePath;
+    private String S3GatewayBasePath;
 
     public String getDriverClass() {
         return driverClass;
@@ -124,5 +127,29 @@ public class ProgramArguments {
 
     public void setEnvironment(String environment) {
         this.environment = environment;
+    }
+
+    public String getAuthyClientBasePath() {
+        return authyClientBasePath;
+    }
+
+    public void setAuthyClientBasePath(String authyClientBasePath) {
+        this.authyClientBasePath = authyClientBasePath;
+    }
+
+    public String getMailgunClientBasePath() {
+        return mailgunClientBasePath;
+    }
+
+    public void setMailgunClientBasePath(String mailgunClientBasePath) {
+        this.mailgunClientBasePath = mailgunClientBasePath;
+    }
+
+    public String getS3GatewayBasePath() {
+        return S3GatewayBasePath;
+    }
+
+    public void setS3GatewayBasePath(String s3GatewayBasePath) {
+        S3GatewayBasePath = s3GatewayBasePath;
     }
 }

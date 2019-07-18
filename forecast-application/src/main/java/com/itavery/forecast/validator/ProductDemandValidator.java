@@ -1,5 +1,6 @@
 package com.itavery.forecast.validator;
 
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.exceptions.InvalidInputException;
 import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;
@@ -16,13 +17,13 @@ public class ProductDemandValidator {
     public void validate(ProductDemandDTO productDemandDTO) throws InvalidInputException {
         try {
             if (!isValidProductCode(productDemandDTO.getProductCode())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_PRODUCT_CODE");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_PRODUCT_CODE);
             } else if (!isValidWarehouse(productDemandDTO.getWarehouse())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_WAREHOUSE");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_WAREHOUSE);
             } else if (!isValidProductCategory(productDemandDTO.getProductCategory())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_PRODUCT_CATEGORY");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_PRODUCT_CATEGORY);
             } else if (!isValidOrderDemand(productDemandDTO.getOrderDemand())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_ORDER_DEMAND");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_ORDER_DEMAND);
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -34,13 +35,13 @@ public class ProductDemandValidator {
     public void validate(ProductDemand productDemand) throws InvalidInputException {
         try {
             if (!isValidProductCode(productDemand.getProductCode())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_PRODUCT_CODE");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_PRODUCT_CODE);
             } else if (!isValidWarehouse(productDemand.getWarehouse())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_WAREHOUSE");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_WAREHOUSE);
             } else if (!isValidProductCategory(productDemand.getProductCategory())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_PRODUCT_CATEGORY");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_PRODUCT_CATEGORY);
             } else if (!isValidOrderDemand(productDemand.getOrderDemand())) {
-                throw new InvalidInputException("ProductDemandValidator_INVALID_ORDER_DEMAND");
+                throw InvalidInputException.buildResponse(Constants.DEMAND_VALIDATOR_INVALID_ORDER_DEMAND);
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

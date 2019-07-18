@@ -1,24 +1,24 @@
 package com.itavery.forecast.dao.user;
 
-import com.itavery.forecast.assemblers.UserAssembler;
 import com.itavery.forecast.constants.AccountStatusType;
-import com.itavery.forecast.constants.OperationResult;
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.constants.Regions;
 import com.itavery.forecast.constants.RoleValues;
+import com.itavery.forecast.domain.assemblers.UserAssembler;
+import com.itavery.forecast.domain.mithra.annotation.Transactional;
+import com.itavery.forecast.domain.mithra.organization.RolesDBFinder;
+import com.itavery.forecast.domain.mithra.organization.RolesDBList;
+import com.itavery.forecast.domain.mithra.user.AccountStatusDB;
+import com.itavery.forecast.domain.mithra.user.AccountStatusDBFinder;
+import com.itavery.forecast.domain.mithra.user.UsersDB;
+import com.itavery.forecast.domain.mithra.user.UsersDBFinder;
 import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.mithra.annotation.Transactional;
-import com.itavery.forecast.mithra.organization.RolesDBFinder;
-import com.itavery.forecast.mithra.organization.RolesDBList;
-import com.itavery.forecast.mithra.user.AccountStatusDB;
-import com.itavery.forecast.mithra.user.AccountStatusDBFinder;
-import com.itavery.forecast.mithra.user.UsersDB;
-import com.itavery.forecast.mithra.user.UsersDBFinder;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.user.UserDTO;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -30,13 +30,15 @@ import javax.inject.Inject;
  */
 
 @Repository
-public class UserDAOImpl implements UserDAO {
+public class UserDAOImpl implements UserDAO, Constants {
 
     private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
-    @Inject
     private UserAssembler userAssembler;
+
     @Inject
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public void setUserAssembler(UserAssembler userAssembler) {
+        this.userAssembler = userAssembler;
+    }
 
     @Override
     @Transactional
@@ -74,7 +76,7 @@ public class UserDAOImpl implements UserDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not find user for username {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("User DAO Error: could not find user");
+            throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, Constants.DAO_USER_NOT_FOUND);
         }
         return userDTO;
     }
@@ -92,7 +94,7 @@ public class UserDAOImpl implements UserDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not find user for email {}", email);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("User DAO Error: could not find user");
+            throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, Constants.DAO_USER_NOT_FOUND);
         }
         return userDTO;
     }
@@ -128,7 +130,7 @@ public class UserDAOImpl implements UserDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not update user for user {}", user.getUserId());
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("User DAO Error: could not update user");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.DAO_USER_NOT_UPDATED);
         }
     }
 
@@ -143,11 +145,11 @@ public class UserDAOImpl implements UserDAO {
                 accountStatusDB.setStatus(AccountStatusType.DEACTIVATED.getCode());
                 accountStatusDB.setActiveAndVerified(false);
             }
-            returnMessage = OperationResult.USER_SUCCESSFUL_DEACTIVATION.getMessage();
+            returnMessage = USER_SUCCESSFUL_DEACTIVATION;
         } catch (DAOException e) {
             LOGGER.error("Could not deactivate user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("User DAO Error: could not deactivate user");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.DAO_USER_NOT_DEACTIVATED);
         }
         return returnMessage;
     }

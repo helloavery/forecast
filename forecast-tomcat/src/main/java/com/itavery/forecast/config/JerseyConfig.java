@@ -1,10 +1,10 @@
 package com.itavery.forecast.config;
 
-import com.itavery.forecast.admin.AdminResourceV1;
-import com.itavery.forecast.demand.DemandResourceV1;
-import com.itavery.forecast.forecast.ForecastResourceV1;
-import com.itavery.forecast.user.UserResourceV1;
-import com.itavery.forecast.verification.VerificationResourceV1;
+import com.itavery.forecast.interaction.AdminResource;
+import com.itavery.forecast.interaction.DemandResource;
+import com.itavery.forecast.interaction.ForecastResource;
+import com.itavery.forecast.interaction.UserResource;
+import com.itavery.forecast.interaction.VerificationResource;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import javax.ws.rs.ApplicationPath;
  */
 
 @Component
-@ApplicationPath("/rest")
+@ApplicationPath("/rest/v1")
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig(){
@@ -25,11 +25,11 @@ public class JerseyConfig extends ResourceConfig {
     }
 
     private void registerEndpoints(){
-        register(AdminResourceV1.class);
-        register(DemandResourceV1.class);
-        register(ForecastResourceV1.class);
-        register(UserResourceV1.class);
-        register(VerificationResourceV1.class);
+        register(AdminResource.class);
+        register(DemandResource.class);
+        register(ForecastResource.class);
+        register(UserResource.class);
+        register(VerificationResource.class);
     }
 
 }

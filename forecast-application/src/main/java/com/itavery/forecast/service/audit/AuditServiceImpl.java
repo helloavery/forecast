@@ -23,8 +23,12 @@ public class AuditServiceImpl implements AuditService {
     private final static String USER_ACCOUNT_ACTIVITY = "ACCOUNT";
     private final static String EMAIL_ACCOUNT_ACTIVITY = "EMAIL";
     private final static String ENTRY_ACCOUNT_ACTIVITY = "ENTRY";
-    @Inject
     private AuditDAO auditDAO;
+
+    @Inject
+    public AuditServiceImpl(AuditDAO auditDAO){
+        this.auditDAO = auditDAO;
+    }
 
     @Override
     public void createAudit(String username, AuditType auditCode, ProductType productType) throws Exception {

@@ -1,6 +1,5 @@
 package com.itavery.forecast;
 
-import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
 
@@ -10,18 +9,17 @@ import javax.ws.rs.core.Response;
  * https://github.com/helloavery
  */
 
-@Component
 public class ResponseBuilder {
 
-    public Response createSuccessResponse(){
+    public static Response createSuccessResponse(){
         return Response.status(Response.Status.OK).build();
     }
 
-    public Response createSuccessResponse(Object entity){
+    public static Response createSuccessResponse(Object entity){
         return Response.status(Response.Status.OK).entity(entity).build();
     }
 
-    public Response createFailureResponse(Response.Status status, String message){
+    public static Response createFailureResponse(Response.Status status, String message){
         return Response.status(status).entity(message).build();
     }
 }

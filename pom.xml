@@ -14,9 +14,7 @@
     <modules>
         <module>forecast-application</module>
         <module>forecast-common</module>
-        <module>forecast-domain</module>
         <module>forecast-dto</module>
-        <module>forecast-rest-api</module>
         <module>forecast-tomcat</module>
     </modules>
 
@@ -43,6 +41,7 @@
         <modelmapper-version>2.1.0</modelmapper-version>
         <postgresql-driver-version>42.2.1</postgresql-driver-version>
         <reladomo-version>17.0.1</reladomo-version>
+        <resteasy-version>4.1.1.Final</resteasy-version>
         <rest-version>2.26</rest-version>
         <servlet-version>4.0.0</servlet-version>
         <spring-boot-version>2.1.0.RELEASE</spring-boot-version>

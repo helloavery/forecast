@@ -2,9 +2,11 @@ package com.itavery.forecast.dao.audit;
 
 import com.itavery.forecast.constants.AuditType;
 import com.itavery.forecast.constants.ProductType;
-import com.itavery.forecast.mithra.annotation.Transactional;
-import com.itavery.forecast.mithra.product.AuditTrailProductDB;
-import com.itavery.forecast.mithra.user.AuditTrailDB;
+import com.itavery.forecast.domain.mithra.annotation.Transactional;
+import com.itavery.forecast.domain.mithra.product.AuditTrailProductDB;
+import com.itavery.forecast.domain.mithra.user.AuditTrailDB;
+import com.itavery.forecast.exceptions.DAOException;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -36,7 +38,7 @@ public class AuditDAOImpl implements AuditDAO {
         } catch (Exception e) {
             LOGGER.error("Could not create audit event for audit code {} and user {}", auditCode, username);
             LOGGER.error(e.getMessage(), e);
-            throw new Exception("Audit DAO: Error creating user audit events");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Audit DAO: Error creating user audit events");
         }
     }
 
@@ -54,7 +56,7 @@ public class AuditDAOImpl implements AuditDAO {
         } catch (Exception e) {
             LOGGER.error("Could not create audit event for audit code {} and user {}", auditCode, username);
             LOGGER.error(e.getMessage(), e);
-            throw new Exception("Audit DAO: Error creating user audit events");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Audit DAO: Error creating user audit events");
         }
     }
 }

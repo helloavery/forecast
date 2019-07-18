@@ -15,7 +15,7 @@ import java.io.StringWriter;
  * https://github.com/helloavery
  */
 
-public class EmailAddressVerificationEmail extends EmailBase implements EmailContent{
+public class EmailAddressVerificationEmail implements EmailContent{
 
     private static final Logger LOGGER = LogManager.getLogger(EmailAddressVerificationEmail.class);
 
@@ -23,14 +23,14 @@ public class EmailAddressVerificationEmail extends EmailBase implements EmailCon
     private final String name;
     private final String email;
     private final String emailToken;
-    private final String environment;
+    private final String contextUrl;
 
-    public EmailAddressVerificationEmail(final VelocityEngine velocityEngine, final String name, final String email, final String emailToken, final String environment){
+    public EmailAddressVerificationEmail(final VelocityEngine velocityEngine, final String name, final String email, final String emailToken, final String contextUrl){
         this.velocityEngine = velocityEngine;
         this.name = name;
         this.email = email;
         this.emailToken = emailToken;
-        this.environment = environment;
+        this.contextUrl = contextUrl;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class EmailAddressVerificationEmail extends EmailBase implements EmailCon
         VelocityContext context = new VelocityContext();
         context.put("name", name);
         context.put("email", email);
-        context.put("VERIFY_EMAIL_LINK", String.format(getForecasterBaseUrl(environment) + Constants.VERIFY_EMAIL_ADDRESS_API, emailToken));
+        context.put("VERIFY_EMAIL_LINK", String.format(contextUrl + Constants.VERIFY_EMAIL_ADDRESS_API, emailToken));
         StringWriter writer = new StringWriter();
         template.merge(context, writer);
         return writer.toString();

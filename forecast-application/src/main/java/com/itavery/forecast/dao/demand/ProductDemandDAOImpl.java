@@ -1,14 +1,15 @@
 package com.itavery.forecast.dao.demand;
 
-import com.itavery.forecast.assemblers.DemandAssembler;
-import com.itavery.forecast.constants.OperationResult;
+import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.domain.assemblers.DemandAssembler;
+import com.itavery.forecast.domain.mithra.annotation.Transactional;
+import com.itavery.forecast.domain.mithra.product.ProductDemandDB;
+import com.itavery.forecast.domain.mithra.product.ProductDemandDBFinder;
+import com.itavery.forecast.domain.mithra.product.ProductDemandDBList;
 import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.mithra.annotation.Transactional;
-import com.itavery.forecast.mithra.product.ProductDemandDB;
-import com.itavery.forecast.mithra.product.ProductDemandDBFinder;
-import com.itavery.forecast.mithra.product.ProductDemandDBList;
 import com.itavery.forecast.product.ProductDemand;
 import com.itavery.forecast.product.ProductDemandDTO;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -24,11 +25,15 @@ import java.util.List;
  */
 
 @Repository
-public class ProductDemandDAOImpl implements ProductDemandDAO {
+public class ProductDemandDAOImpl implements ProductDemandDAO, Constants{
 
     private static final Logger LOGGER = LogManager.getLogger(ProductDemandDAOImpl.class);
-    @Inject
     private DemandAssembler demandAssembler;
+
+    @Inject
+    public void setDemandAssembler(DemandAssembler demandAssembler) {
+        this.demandAssembler = demandAssembler;
+    }
 
     @Override
     @Transactional
@@ -38,11 +43,11 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
             ProductDemandDB productDemand = demandAssembler.covertToDB(productDemandDTO);
             productDemand.setUserId(userId);
             productDemand.cascadeInsert();
-            return OperationResult.PRODUCT_DEMAND_ADD_ENTRY_SUCCESS.getMessage();
+            return PRODUCT_DEMAND_ADD_ENTRY_SUCCESS;
         } catch (DAOException e) {
             LOGGER.error("Could not add demand entry for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Demand DAO Error: Could not add entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not add entry");
         }
     }
 
@@ -62,7 +67,7 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not fetch entry for demandId {}", productDemandId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Demand DAO Error: Could not get entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not get entry");
         }
         return productDemandDto;
     }
@@ -86,7 +91,7 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not fetch demand entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Demand DAO Error: Could not get list of demand entries");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not get list of demand entries");
         }
         return productDemandDtoList;
     }
@@ -109,7 +114,7 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not update demand entry for user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Demand DAO Error: Could not update demand entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not update demand entry");
         }
     }
 
@@ -125,7 +130,7 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
                 if (productDemandDB != null) {
                     LOGGER.info("Removing entry: " + demandId);
                     productDemandDB.terminate();
-                    message = OperationResult.PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL.getMessage();
+                    message = PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
 
                 } else {
                     LOGGER.error("No entry found for id: {}, continuing operations...", demandId);
@@ -134,7 +139,7 @@ public class ProductDemandDAOImpl implements ProductDemandDAO {
         } catch (DAOException e) {
             LOGGER.error("Could not remove demand entry for demandId {}", productDemandId);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Product Demand DAO Error: Could not remove demand entry");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,  "Product Demand DAO Error: Could not remove demand entry");
         }
         return message;
     }

@@ -1,9 +1,11 @@
 package com.itavery.forecast.dao.entitlement;
 
 import com.itavery.forecast.constants.RoleValues;
+import com.itavery.forecast.domain.mithra.user.UserRolesDB;
+import com.itavery.forecast.domain.mithra.user.UserRolesDBFinder;
+import com.itavery.forecast.exceptions.DAOException;
 import com.itavery.forecast.exceptions.InvalidEntitlementException;
-import com.itavery.forecast.mithra.user.UserRolesDB;
-import com.itavery.forecast.mithra.user.UserRolesDBFinder;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -28,7 +30,7 @@ public class EntitlementDAOImpl implements EntitlementDAO{
         }
         catch(Exception e){
             LOGGER.error("Error checking user entitlement for user {} and role {}", userId, role.getName());
-            throw new RuntimeException("Error checking user entitlement for user");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Error checking user entitlement for user");
         }
     }
 }

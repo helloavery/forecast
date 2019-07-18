@@ -38,17 +38,7 @@
         </dependency>
         <dependency>
             <groupId>com.itavery.forecast</groupId>
-            <artifactId>forecast-domain</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itavery.forecast</groupId>
             <artifactId>forecast-dto</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itavery.forecast</groupId>
-            <artifactId>forecast-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

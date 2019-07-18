@@ -14,7 +14,7 @@ import java.io.StringWriter;
  * https://github.com/helloavery
  */
 
-public class PasswordChangeEmail extends EmailBase implements EmailContent{
+public class PasswordChangeEmail implements EmailContent{
 
     private static final Logger LOGGER = LogManager.getLogger(PasswordChangeEmail.class);
 

@@ -1,11 +1,10 @@
 package com.itavery.forecast.service.email;
 
-import com.itavery.forecast.bootconfig.ProgramArguments;
 import com.itavery.forecast.constants.AuditType;
 import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.credentials.SecretsRetrieval;
 import com.itavery.forecast.exceptions.EmailSenderException;
 import com.itavery.forecast.service.audit.AuditService;
+import com.itavery.forecast.util.credentials.SecretsRetrieval;
 import net.sargue.mailgun.Configuration;
 import net.sargue.mailgun.Mail;
 import org.apache.logging.log4j.LogManager;
@@ -25,41 +24,47 @@ import javax.inject.Inject;
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger LOGGER = LogManager.getLogger(EmailServiceImpl.class);
-    @Inject
     private AuditService auditService;
-    @Inject
     private VelocityEngine velocityEngine;
-    @Inject
-    private ProgramArguments programArguments;
-    @Inject
     private SecretsRetrieval secretsRetrieval;
 
+    @Inject
+    public EmailServiceImpl(VelocityEngine velocityEngine, SecretsRetrieval secretsRetrieval){
+        this.velocityEngine = velocityEngine;
+        this.secretsRetrieval = secretsRetrieval;
+    }
+
+    @Inject
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+
     @Override
-    public void sendEmailAddressVerificationEmail(String emailAddress, String name, String emailToken) throws Exception {
+    public void sendEmailAddressVerificationEmail(String contextUrl, String emailAddress, String name, String emailToken) throws Exception {
         String subject = "Please verify your Forecaster E-mail Address";
-        EmailContent emailContent = getVerificationEmail(emailAddress, name, emailToken, programArguments.getEnvironment());
+        EmailContent emailContent = getVerificationEmail(emailAddress, name, emailToken, contextUrl);
         if(sendEmail(emailAddress,subject,emailContent)){
             auditService.createAudit(emailAddress, AuditType.EMAIL_VERIFICATION_CREATED, null);
         }
         else{
             LOGGER.error("Error sending e-mail");
-            throw new EmailSenderException("Could not send account e-mail verification for e-mail: " + emailAddress);
+            throw EmailSenderException.buildResponse("Could not send account e-mail verification for e-mail: " + emailAddress);
         }
     }
 
     @Override
-    public void sendPasswordChangeEmail(String emailAddress, String name) throws Exception{
+    public void sendPasswordChangeEmail(String contextUrl, String emailAddress, String name) throws Exception{
         String subject = "Forecaster Password Change";
         EmailContent emailContent = getPasswordChangeEmail(emailAddress, name);
         if(!sendEmail(emailAddress,subject,emailContent)){
             LOGGER.error("Error sending e-mail");
-            throw new EmailSenderException("Could not send account password change for e-mail: " + emailAddress);
+            throw EmailSenderException.buildResponse("Could not send account password change for e-mail: " + emailAddress);
         }
     }
 
     @Override
-    public EmailContent getVerificationEmail(String emailAddress, String name, String emailToken, String environment){
-        return new EmailAddressVerificationEmail(velocityEngine, name, emailAddress, emailToken, environment);
+    public EmailContent getVerificationEmail(String emailAddress, String name, String emailToken, String contextUrl){
+        return new EmailAddressVerificationEmail(velocityEngine, name, emailAddress, emailToken, contextUrl);
     }
 
     @Override

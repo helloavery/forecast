@@ -8,9 +8,9 @@ package com.itavery.forecast.service.email;
 
 public interface EmailService {
 
-    void sendEmailAddressVerificationEmail(String emailAddress, String name, String emailToken) throws Exception;
+    void sendEmailAddressVerificationEmail(String contextUrl, String emailAddress, String name, String emailToken) throws Exception;
 
-    void sendPasswordChangeEmail(String emailAddress, String name) throws Exception;
+    void sendPasswordChangeEmail(String contextUrl, String emailAddress, String name) throws Exception;
 
     EmailContent getVerificationEmail(String emailAddress, String name, String emailToken, String environment);
 

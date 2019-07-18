@@ -28,18 +28,23 @@ import java.util.List;
 public class ProductForecastServiceImpl implements ProductForecastService {
 
     private final static Logger LOGGER = LogManager.getLogger(ProductForecastServiceImpl.class);
-    @Inject
     private AuditService auditService;
-    @Inject
     private ProductForecastDAO productForecastDAO;
-    @Inject
     private ProductForecastValidator productForecastValidator;
+
     @Inject
-    ResponseBuilder responseBuilder;
+    public ProductForecastServiceImpl(ProductForecastDAO productForecastDAO, ProductForecastValidator productForecastValidator){
+        this.productForecastDAO = productForecastDAO;
+        this.productForecastValidator = productForecastValidator;
+    }
+
+    @Inject
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
 
     @Override
     public Response addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException {
-        String returnMessage = null;
         try {
             LOGGER.info("Validating forecast entry for user {}", userId);
             productForecastValidator.validate(productForecast);
@@ -47,12 +52,12 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.FORECAST);
 
             LOGGER.info("Attempting to add forecast entry for user {}", userId);
-            returnMessage = productForecastDAO.addForecastEntry(userId, productForecast);
-            return responseBuilder.createSuccessResponse(returnMessage);
+            String returnMessage = productForecastDAO.addForecastEntry(userId, productForecast);
+            return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not add forecast entry for user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_ADDING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_ADDING_ENTRY);
         }
     }
 
@@ -61,9 +66,9 @@ public class ProductForecastServiceImpl implements ProductForecastService {
         LOGGER.info("Attempting to get forecast entries for user {}", userId);
         List<ProductForecastDTO> productForecastDtoList = productForecastDAO.getForecastEntries(userId);
         if (productForecastDtoList.isEmpty()) {
-            return responseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
+            return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         } else {
-            return responseBuilder.createSuccessResponse(productForecastDtoList);
+            return ResponseBuilder.createSuccessResponse(productForecastDtoList);
         }
     }
 
@@ -78,11 +83,11 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             String returnMessage = productForecastDAO.updateForecastEntries(productForecastList, userId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.FORECAST);
-            return responseBuilder.createSuccessResponse(returnMessage);
+            return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not update forecast entry for user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
         }
     }
 
@@ -93,11 +98,11 @@ public class ProductForecastServiceImpl implements ProductForecastService {
             String returnMessage = productForecastDAO.deleteForecastEntry(productForecastId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_REMOVED, ProductType.FORECAST);
-            return responseBuilder.createSuccessResponse(returnMessage);
+            return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not delete product forecast entry {}", productForecastId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_DELETING_ENTRY);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_DELETING_ENTRY);
         }
     }
 }

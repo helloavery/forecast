@@ -24,6 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 
 /**
  * @author Avery Grimes-Farrow
@@ -35,22 +36,36 @@ import javax.ws.rs.core.Response;
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
-    @Inject
     private SessionManager sessionManager;
-    @Inject
     private AuditService auditService;
-    @Inject
     private UserDAO userDAO;
-    @Inject
     private UserValidator userValidator;
-    @Inject
     private EmailService emailService;
-    @Inject
     private VerificationService verificationService;
-    @Inject
     private AuthyService authyService;
+
     @Inject
-    ResponseBuilder responseBuilder;
+    public UserServiceImpl(UserDAO userDAO, EmailService emailService, VerificationService verificationService, AuthyService authyService){
+        this.userDAO = userDAO;
+        this.emailService = emailService;
+        this.verificationService = verificationService;
+        this.authyService = authyService;
+    }
+
+    @Inject
+    public void setSessionManager(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
+
+    @Inject
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+
+    @Inject
+    public void setUserValidator(UserValidator userValidator) {
+        this.userValidator = userValidator;
+    }
 
     @Override
     public Response createUser(HttpServletRequest request, RegistrationDTO registrationDTO) throws ServiceException {
@@ -61,23 +76,24 @@ public class UserServiceImpl implements UserService {
             Integer authyId = authyService.createAuthyUser(registrationDTO);
             if(authyId == null){
                 LOGGER.error("Could not create authy user using e-mail {} and phone number {}-{}", registrationDTO.getEmail(),registrationDTO.getCountryCode(),registrationDTO.getPhoneNumber());
-                return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_AUTHY_USER_NOT_CREATED);
+                return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_AUTHY_USER_NOT_CREATED);
             }
             UserDTO userDTO = userDAO.createUser(registrationDTO, authyId);
             if (userDTO == null) {
                 LOGGER.error("Error creating user");
-                return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_USER_NOT_CREATED);
+                return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_USER_NOT_CREATED);
             }
             String emailToken = verificationService.generateToken(registrationDTO.getEmail());
-            emailService.sendEmailAddressVerificationEmail(registrationDTO.getEmail(), registrationDTO.getFirstName(), emailToken);
+            URI contextUrl = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
+            emailService.sendEmailAddressVerificationEmail(contextUrl.toString(), registrationDTO.getEmail(), registrationDTO.getFirstName(), emailToken);
             auditService.createAudit(registrationDTO.getUsername(), AuditType.ACCOUNT_CREATED, null);
             auditService.createAudit(registrationDTO.getUsername(), AuditType.ACCOUNT_ACTIVATED, null);
             partialLogIn(request, userDTO.getUserId());
             LOGGER.info("Successfully completed addition of new user {} : {}", registrationDTO.getUsername(),registrationDTO.getEmail());
-            return responseBuilder.createSuccessResponse(userDTO);
+            return ResponseBuilder.createSuccessResponse(userDTO);
         } catch (Exception e) {
             LOGGER.error("Service: Could not register user", e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR,Constants.SERVICE_CANNOT_REGISTER_USER);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR,Constants.SERVICE_CANNOT_REGISTER_USER);
         }
     }
 
@@ -88,11 +104,11 @@ public class UserServiceImpl implements UserService {
             UserDTO userDTO = userDAO.findUser(userId);
             int authyUserId = userDTO.getAuthyUserId();
             boolean success =  authyService.verifyAuthyUser(request, code, authyUserId);
-            return responseBuilder.createSuccessResponse(success);
+            return ResponseBuilder.createSuccessResponse(success);
         }
         catch(Exception e){
             LOGGER.error("Service: Could not verify Authy user", e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_VERIFY_AUTHY_USER);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_VERIFY_AUTHY_USER);
         }
     }
 
@@ -101,11 +117,11 @@ public class UserServiceImpl implements UserService {
         try{
             UserDTO userDTO = userDAO.findUser(user.getEmail());
             boolean success = authyService.requestAuthyOTP(request, userDTO, user.getAuthyOtpMethod());
-            return responseBuilder.createSuccessResponse(success);
+            return ResponseBuilder.createSuccessResponse(success);
         }
         catch(Exception e){
             LOGGER.error("Service: Could not login user", e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_LOGIN_USER);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_LOGIN_USER);
         }
     }
 
@@ -116,11 +132,11 @@ public class UserServiceImpl implements UserService {
             UserDTO userDTO = userDAO.findUser(userId);
             int authyId = userDTO.getAuthyUserId();
             boolean success =  authyService.verifyAuthyOTP(token, authyId);
-            return responseBuilder.createSuccessResponse(success);
+            return ResponseBuilder.createSuccessResponse(success);
         }
         catch(Exception e){
             LOGGER.error("Service: Could not verify authy OTP", e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_VERIFY_OTP);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_CANNOT_VERIFY_OTP);
         }
     }
 
@@ -130,9 +146,9 @@ public class UserServiceImpl implements UserService {
         UserDTO userDto = userDAO.findUser(userId);
         if (userDto == null) {
             LOGGER.error("Service: Error finding user {}", userId);
-            return responseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
+            return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         }
-        return responseBuilder.createSuccessResponse(userDto);
+        return ResponseBuilder.createSuccessResponse(userDto);
     }
 
     @Override
@@ -144,11 +160,11 @@ public class UserServiceImpl implements UserService {
             userDAO.updateUser(user);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ACCOUNT_UPDATED, null);
-            return responseBuilder.createSuccessResponse();
+            return ResponseBuilder.createSuccessResponse();
         } catch (Exception e) {
             LOGGER.error("Service: Could not create audit event for user update for {}", userId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_USER);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_USER);
         }
     }
 
@@ -159,11 +175,11 @@ public class UserServiceImpl implements UserService {
             LOGGER.info("Attempting to deactivate user {}", userId);
             returnMessage = userDAO.deactivateUser(userId);
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ACCOUNT_DEACTIVATED, null);
-            return responseBuilder.createSuccessResponse(returnMessage);
+            return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not deactivate user {}", userId);
             LOGGER.error(e.getMessage(), e);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_DEACTIVATING_USER);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_DEACTIVATING_USER);
         }
     }
 

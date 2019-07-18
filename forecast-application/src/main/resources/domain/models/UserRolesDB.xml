@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<MithraObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              objectType="transactional"
+              xsi:noNamespaceSchemaLocation="reladomoobject.xsd">
+
+    <PackageName>com.itavery.forecast.domain.mithra.user</PackageName>
+    <ClassName>UserRolesDB</ClassName>
+    <DefaultTable>forecaster.ser_roles</DefaultTable>
+
+    <AsOfAttribute name="processingDate"
+                   infinityDate="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   defaultIfNotSpecified="[com.gs.fw.common.mithra.util.DefaultInfinityTimestamp.getDefaultInfinity()]"
+                   fromColumnName="in_date"
+                   toColumnName="out_date"
+                   isProcessingDate="true"
+                   toIsInclusive="false"/>
+
+
+    <Attribute name="userId" javaType="int" columnName="user_id" primaryKey="true"/>
+    <Attribute name="roleId" javaType="int" columnName="role_id" primaryKey="true"/>
+
+    <Relationship name="roles" relatedObject="RolesDB" cardinality="many-to-one">RolesDB.roleId = this.roleId</Relationship>
+
+</MithraObject>

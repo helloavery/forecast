@@ -1,5 +1,6 @@
 package com.itavery.forecast.validator;
 
+import com.itavery.forecast.constants.Constants;
 import com.itavery.forecast.exceptions.InvalidInputException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,13 +14,13 @@ public class UserValidator {
     public void validate(String email, String password, String firstName, String lastName) throws InvalidInputException {
         try {
             if (!isValidEmail(email)) {
-                throw new InvalidInputException("UserValidator_INVALID_EMAIL");
+                throw InvalidInputException.buildResponse(Constants.USER_INVALID_EMAIL);
             } else if (!isValidPassword(password)) {
-                throw new InvalidInputException("UserValidator_INVALID_PASSWORD");
+                throw InvalidInputException.buildResponse(Constants.USER_INVALID_PASSWORD);
             } else if (!isValidFirstName(firstName)) {
-                throw new InvalidInputException("UserValidator_INVALID_FIRST_NAME");
+                throw InvalidInputException.buildResponse(Constants.USER_INVALID_FIRST_NAME);
             } else if (!isValidLastName(lastName)) {
-                throw new InvalidInputException("UserValidator_INVALID_LAST_NAME");
+                throw InvalidInputException.buildResponse(Constants.USER_INVALUD_LAST_NAME);
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

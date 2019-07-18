@@ -21,11 +21,6 @@
         </dependency>
         <dependency>
             <groupId>com.itavery.forecast</groupId>
-            <artifactId>forecast-domain</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itavery.forecast</groupId>
             <artifactId>forecast-dto</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -42,6 +37,17 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>${resteasy-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+            <version>${resteasy-version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180813</version>
@@ -52,5 +58,131 @@
             <artifactId>mailgun</artifactId>
             <version>1.9.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.goldmansachs.reladomo</groupId>
+            <artifactId>reladomo</artifactId>
+            <version>${reladomo-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.goldmansachs.reladomo</groupId>
+            <artifactId>reladomo-serial</artifactId>
+            <version>${reladomo-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.goldmansachs.reladomo</groupId>
+            <artifactId>reladomo-test-util</artifactId>
+            <version>${reladomo-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.goldmansachs</groupId>
+            <artifactId>gs-collections</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/target/generated-sources/reladomo/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>generateReladomo</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <property name="plugin_classpath" refid="maven.plugin.classpath"/>
+                                <taskdef name="gen-reladomo" classpath="plugin_classpath"
+                                         classname="com.gs.fw.common.mithra.generator.MithraGenerator"/>
+                                <gen-reladomo xml="${project.basedir}/src/main/resources/domain/models/ReladomoClassList.xml"
+                                              generateGscListMethod="true"
+                                              generatedDir="${project.build.directory}/generated-sources/reladomo"
+                                              nonGeneratedDir="${project.basedir}/src/main/java"
+                                />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generateDatabase</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <property name="plugin_classpath" refid="maven.plugin.classpath"/>
+                                <taskdef name="gen-reladomo-db" classpath="plugin_classpath"
+                                         classname="com.gs.fw.common.mithra.generator.dbgenerator.MithraDbDefinitionGenerator"/>
+                                <gen-reladomo-db
+                                        xml="${project.basedir}/src/main/resources/domain/models/ReladomoClassList.xml"
+                                        generatedDir="${project.basedir}/src/main/resources/domain/database"
+                                        databaseType="Postgres"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.goldmansachs.reladomo</groupId>
+                        <artifactId>reladomo</artifactId>
+                        <version>${reladomo-version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.goldmansachs.reladomo</groupId>
+                        <artifactId>reladomogen</artifactId>
+                        <version>${reladomo-version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.goldmansachs.reladomo</groupId>
+                        <artifactId>reladomo-gen-util</artifactId>
+                        <version>${reladomo-version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+            </plugin>
+        </plugins>
+    </build>
+
+
 </project>

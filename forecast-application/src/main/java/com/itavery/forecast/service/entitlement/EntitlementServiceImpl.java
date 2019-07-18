@@ -19,8 +19,12 @@ import javax.inject.Inject;
 public class EntitlementServiceImpl implements EntitlementService {
 
     private static final Logger LOGGER = LogManager.getLogger(EntitlementServiceImpl.class);
+    private EntitlementDAO entitlementDAO;
+
     @Inject
-    EntitlementDAO entitlementDAO;
+    public EntitlementServiceImpl(EntitlementDAO entitlementDAO){
+        this.entitlementDAO = entitlementDAO;
+    }
 
     @Override
     public void matchEntitlementAgainstUser(int userId, RoleValues role) throws InvalidEntitlementException {
@@ -28,7 +32,7 @@ public class EntitlementServiceImpl implements EntitlementService {
             boolean isRequestedEntitlementPresent = entitlementDAO.verifyEntitlement(userId, role);
             if(!isRequestedEntitlementPresent){
                 LOGGER.error("User does not have the requested entitlements");
-                throw new InvalidEntitlementException("Requested user does not have the requested entitlements");
+                throw InvalidEntitlementException.buildResponse("Requested user does not have the requested entitlements");
             }
             LOGGER.info("User {} has requested entitlement {}", userId, role.getName());
         }

@@ -6,6 +6,7 @@ import com.authy.api.Token;
 import com.authy.api.User;
 import com.itavery.forecast.constants.AuthyOtpMethod;
 import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.interaction.client.ClientRestManager;
 import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.UserDTO;
 import com.twilio.http.TwilioRestClient;
@@ -13,13 +14,7 @@ import com.twilio.rest.api.v2010.account.MessageCreator;
 import com.twilio.type.PhoneNumber;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
@@ -36,19 +31,31 @@ import javax.servlet.http.HttpSession;
 public class AuthyServiceImpl implements AuthyService{
 
     private static final Logger LOGGER = LogManager.getLogger(AuthyServiceImpl.class);
-    @Inject
-    private AuthyApiClient authyClient;
-    @Inject
+    private AuthyApiClient authyApiClient;
     private TwilioRestClient twilioRestClient;
+    private ClientRestManager authyClient;
+
     @Inject
-    private RestTemplate restTemplate;
+    public void setAuthyApiClient(AuthyApiClient authyApiClient) {
+        this.authyApiClient = authyApiClient;
+    }
+
+    @Inject
+    public void setTwilioRestClient(TwilioRestClient twilioRestClient) {
+        this.twilioRestClient = twilioRestClient;
+    }
+
+    @Inject
+    public void setAuthyClient(ClientRestManager authyClient) {
+        this.authyClient = authyClient;
+    }
 
     public Integer createAuthyUser(RegistrationDTO user) throws AuthyException {
         try{
-            User authyUser = authyClient.getUsers().createUser(user.getEmail(),user.getPhoneNumber(),user.getCountryCode());
+            User authyUser = authyApiClient.getUsers().createUser(user.getEmail(),user.getPhoneNumber(),user.getCountryCode());
             if(authyUser.isOk()){
                 int authyUserId = authyUser.getId();
-                authyClient.getUsers().requestSms(authyUserId);
+                authyApiClient.getUsers().requestSms(authyUserId);
                 return authyUserId;
             }
             else{
@@ -64,7 +71,7 @@ public class AuthyServiceImpl implements AuthyService{
 
     public boolean verifyAuthyUser(HttpServletRequest request, String code, int authyUserId) throws AuthyException{
         try{
-            Token token = authyClient.getTokens().verify(authyUserId, code);
+            Token token = authyApiClient.getTokens().verify(authyUserId, code);
             if(token.isOk()){
                 send("","");
                 return true;
@@ -79,27 +86,22 @@ public class AuthyServiceImpl implements AuthyService{
 
     public boolean requestAuthyOTP(HttpServletRequest request, UserDTO userDTO, AuthyOtpMethod authyOtpMethod){
         try{
+            AuthyResponse authyResponse = null;
             int userId = userDTO.getUserId();
             int authyId = userDTO.getAuthyUserId();
-            String authyOtpRequestURL;
             switch(authyOtpMethod){
                 case SMS:
-                    authyOtpRequestURL = String.format(Constants.AUTHY_SEND_SMS_OTP, authyId);
+                    authyResponse = authyClient.sendSMSOTP("", authyId);
                     break;
                 case VOICE:
-                    authyOtpRequestURL = String.format(Constants.AUTHY_VOICE_OTP, authyId);
+                    authyResponse = authyClient.sendVoiceOTP("", authyId);
                     break;
                 default:
-                    authyOtpRequestURL = String.format(Constants.AUTHY_SEND_SMS_OTP, authyId);
+                    authyResponse = authyClient.sendSMSOTP("", authyId);
                     break;
             }
-            ResponseEntity<AuthyResponse> authyResponse = sendAndReceiveAuthyResponse(authyOtpRequestURL, HttpMethod.GET);
-            if(authyResponse.getStatusCodeValue() >= 400 || authyResponse.getBody() == null){
-                LOGGER.error("Error retrieving response for Authy OTP via method {} for userId {}", authyOtpMethod, authyId);
-                throw new RuntimeException("Error retrieving response for Authy OTP");
-            }
             partialLogIn(request, userId);
-            return authyResponse.getBody().otpSuccessfullySent();
+            return authyResponse.otpSuccessfullySent();
         }
         catch(Exception e){
             LOGGER.error("Error sending Authy OTP via {} for Authy userId {}", authyOtpMethod, userDTO.getAuthyUserId() + e.getMessage());
@@ -109,26 +111,13 @@ public class AuthyServiceImpl implements AuthyService{
 
     public boolean verifyAuthyOTP(String token, int authyId){
         try{
-            String authyOtpVerifyURL = String.format(Constants.AUTHY_VERIFY_OTP, token, authyId);
-            ResponseEntity<AuthyResponse> authyResponse = sendAndReceiveAuthyResponse(authyOtpVerifyURL, HttpMethod.GET);
-            if(authyResponse.getStatusCodeValue() >= 400 || authyResponse.getBody() == null){
-                LOGGER.error("Error with response for verifying Authy OTP for userId {}", authyId);
-                throw new RuntimeException("Error with response for verifying Authy OTP");
-            }
-            return authyResponse.getBody().otpSuccessfullySent();
+            AuthyResponse authyResponse = authyClient.verifyOTP("", token, authyId);
+            return authyResponse.otpSuccessfullySent();
         }
         catch(Exception e){
             LOGGER.error("Error verifying Authy OTP for authyUserId {}", authyId);
             throw new RuntimeException("Error verifying Authy OTP", e);
         }
-    }
-
-    private ResponseEntity<AuthyResponse> sendAndReceiveAuthyResponse(String endPoint, HttpMethod httpMethod){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-Authy-API-Key","");
-        HttpEntity<?> authyRequest = new HttpEntity<>(headers);
-        return restTemplate.exchange(endPoint, httpMethod, authyRequest, AuthyResponse.class);
     }
 
     private void send(String to, String message) {

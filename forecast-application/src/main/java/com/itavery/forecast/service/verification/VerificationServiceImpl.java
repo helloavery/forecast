@@ -24,14 +24,16 @@ import java.security.SecureRandom;
 public class VerificationServiceImpl implements VerificationService{
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationServiceImpl.class);
-    @Inject
     private VerificationDAO verificationDAO;
-    @Inject
     private AuditService auditService;
-    @Inject
     private MailgunEmailVerification mailgunEmailVerification;
+
     @Inject
-    ResponseBuilder responseBuilder;
+    public VerificationServiceImpl(VerificationDAO verificationDAO, AuditService auditService, MailgunEmailVerification mailgunEmailVerification){
+        this.verificationDAO = verificationDAO;
+        this.auditService = auditService;
+        this.mailgunEmailVerification = mailgunEmailVerification;
+    }
 
     public String generateToken(String email){
         try{
@@ -62,7 +64,7 @@ public class VerificationServiceImpl implements VerificationService{
             String email = verificationDAO.retrieveEmail(token);
             if(email == null){
                 LOGGER.error("Email could not be found for token {}", token);
-                return responseBuilder.createFailureResponse(Response.Status.BAD_REQUEST,  "");
+                return ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST,  "");
             }
             JsonNode emailValidationResponse = mailgunEmailVerification.validateEmail(email);
             boolean isDisposableAddress = (boolean) emailValidationResponse.getObject().get("is_disposable_address");
@@ -70,17 +72,16 @@ public class VerificationServiceImpl implements VerificationService{
             if(!isDisposableAddress && isValid){
                 String result = verificationDAO.updateAccountStatus(email);
                 auditService.createAudit(email, AuditType.EMAIL_VERIFIED, null);
-                return responseBuilder.createSuccessResponse(result);
-
+                return ResponseBuilder.createSuccessResponse(result);
             }
             else{
                 LOGGER.info("E-mail address {} is not valid", email);
-                return responseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "E-mail address is not valid");
+                return ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "E-mail address is not valid");
             }
         }
         catch(Exception e){
             LOGGER.error("Error verifying email address for token {}", token);
-            return responseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, "Error verifying email address for token " + token);
+            return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, "Error verifying email address for token " + token);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.itavery.forecast.config;
 
 import com.authy.AuthyApiClient;
-import com.itavery.forecast.credentials.SecretsRetrieval;
+import com.itavery.forecast.util.credentials.SecretsRetrieval;
 import com.twilio.http.TwilioRestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +17,12 @@ import javax.inject.Inject;
 @Configuration
 public class AuthyConfig {
 
-    @Inject
     private SecretsRetrieval secretsRetrieval;
+
+    @Inject
+    public AuthyConfig(SecretsRetrieval secretsRetrieval){
+        this.secretsRetrieval = secretsRetrieval;
+    }
 
     @Bean
     AuthyApiClient AuthyApiClientInit(){

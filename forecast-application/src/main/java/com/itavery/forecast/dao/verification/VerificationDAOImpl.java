@@ -1,13 +1,14 @@
 package com.itavery.forecast.dao.verification;
 
 import com.itavery.forecast.constants.AccountStatusType;
-import com.itavery.forecast.constants.OperationResult;
+import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.domain.mithra.annotation.Transactional;
+import com.itavery.forecast.domain.mithra.user.AccountStatusDB;
+import com.itavery.forecast.domain.mithra.user.AccountStatusDBFinder;
+import com.itavery.forecast.domain.mithra.user.EmailTokenDB;
+import com.itavery.forecast.domain.mithra.user.EmailTokenDBFinder;
 import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.mithra.annotation.Transactional;
-import com.itavery.forecast.mithra.user.AccountStatusDB;
-import com.itavery.forecast.mithra.user.AccountStatusDBFinder;
-import com.itavery.forecast.mithra.user.EmailTokenDB;
-import com.itavery.forecast.mithra.user.EmailTokenDBFinder;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public class VerificationDAOImpl implements VerificationDAO {
+public class VerificationDAOImpl implements VerificationDAO, Constants {
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationDAOImpl.class);
 
@@ -34,32 +35,29 @@ public class VerificationDAOImpl implements VerificationDAO {
         }
         catch(Exception e){
             LOGGER.error("");
-            throw new RuntimeException();
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "");
         }
     }
 
     @Override
     public String retrieveEmail(String token){
-        String email;
         try{
             EmailTokenDB emailTokenDB = EmailTokenDBFinder.findOne(EmailTokenDBFinder.token().eq(token));
             if(emailTokenDB == null){
                 LOGGER.error("Could not locate email with token {}", token);
-                throw new RuntimeException();
+                throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, "Verification token did not match against any e-mail");
             }
-            email = emailTokenDB.getEmail();
+            return emailTokenDB.getEmail();
         }
         catch(Exception e){
             LOGGER.error("Error attempting to fetch email");
-            throw new RuntimeException("Error attempting to fetch email", e);
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Error attempting to fetch email");
         }
-        return email;
     }
 
     @Override
     @Transactional
     public String updateAccountStatus(String email) throws DAOException {
-        String returnMessage = null;
         try {
             AccountStatusDB accountStatusDB = AccountStatusDBFinder.findOne(AccountStatusDBFinder.user().email().eq(email));
             if (accountStatusDB != null) {
@@ -67,17 +65,15 @@ public class VerificationDAOImpl implements VerificationDAO {
                 if (status.equals(AccountStatusType.ACTIVE.getCode())) {
                     accountStatusDB.setEmailVerified(true);
                     accountStatusDB.setActiveAndVerified(true);
-                    returnMessage = OperationResult.VERIFICATION_EMAIL_VERIFICATION_SUCCESSFUL.getMessage();
+                    return VERIFICATION_EMAIL_VERIFICATION_SUCCESSFUL;
                 }
-            } else {
-                LOGGER.error("No verification token found");
-                returnMessage = OperationResult.DAO_TECHNICAL_ERROR.getMessage();
             }
+            LOGGER.error("No verification token found");
+            throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, "Verification token not valid");
         } catch (DAOException e) {
-            LOGGER.error("Could not verify email address for email", email);
+            LOGGER.error("Could not verify email address for email {}", email);
             LOGGER.error(e.getMessage(), e);
-            throw new DAOException("Verification DAO Error: could not verify user email");
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Verification DAO Error: could not verify user email");
         }
-        return returnMessage;
     }
 }
