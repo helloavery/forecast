@@ -8,14 +8,14 @@ Based on Kickstarter data (Product Demand and Product Forecast). [You can grab t
 
 # Structure
 
-* This is the backend application. There is a separate project for the UI which utilizes Angular 6 CLI
+* This is a backend application.
 * Language : Java 8
-* DB : Postgres (10.6) 
-* ORM : [Goldman Sachs Reladomo][reladomohomepage]
+* DB : MongoDB (4.2.0)
 * Uses my [S3 Gateway Project][s3gateway] in order to retrieve and push secrets
+* Uses Kafka (Notification Manager Project) in order to send events such as e-mail notifications
+* Uses my Service Discovery project (Open Feign) for REST related logic
 * Twilio Authy verifies tokens at account creation as well issues one-time passwords for account login
 * Mailgun (transactional API) handles sending e-mails, as well as verifying valid e-mail addresses
-* Possibly might incorporate R
 
 [forecastdata]: https://averygrimes.com/experience/experience#softwareengineer
 [reladomohomepage]: https://github.com/goldmansachs/reladomo
