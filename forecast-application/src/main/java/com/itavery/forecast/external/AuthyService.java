@@ -1,9 +1,8 @@
 package com.itavery.forecast.external;
 
 import com.authy.AuthyException;
-import com.itavery.forecast.constants.AuthyOtpMethod;
-import com.itavery.forecast.user.RegistrationDTO;
-import com.itavery.forecast.user.UserDTO;
+import com.itavery.forecast.functional.AuthyOtpMethod;
+import com.itavery.forecast.response.UserResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface AuthyService {
 
-    Integer createAuthyUser(RegistrationDTO user) throws AuthyException;
+    Integer createAuthyUser(String email, String countryCode, String phoneNumber) throws AuthyException;
 
     boolean verifyAuthyUser(HttpServletRequest request, String code, int authyUserId) throws AuthyException;
 
-    boolean requestAuthyOTP(HttpServletRequest request, UserDTO userDTO, AuthyOtpMethod authyOtpMethod);
+    boolean requestAuthyOTP(HttpServletRequest request, UserResponse userDTO, AuthyOtpMethod authyOtpMethod);
 
     boolean verifyAuthyOTP(String token, int authyId);
 }

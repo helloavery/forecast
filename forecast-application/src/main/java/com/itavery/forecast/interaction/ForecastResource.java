@@ -1,9 +1,10 @@
 package com.itavery.forecast.interaction;
 
-import com.itavery.forecast.product.ProductForecast;
-import com.itavery.forecast.product.ProductForecastDTO;
+import com.itavery.forecast.request.ProductForecastRequest;
 import com.itavery.forecast.service.forecast.ProductForecastService;
-import com.itavery.forecast.session.SessionManager;
+import com.itavery.forecast.utils.ResponseBuilder;
+import com.itavery.forecast.utils.session.SessionManager;
+import com.itavery.forecast.utils.validation.ValidProductForecastRequest;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
@@ -28,7 +29,7 @@ public class ForecastResource {
     private SessionManager sessionManager;
 
     @Inject
-    public ForecastResource(ProductForecastService productForecastService){
+    public void setProductForecastService(ProductForecastService productForecastService) {
         this.productForecastService = productForecastService;
     }
 
@@ -41,7 +42,7 @@ public class ForecastResource {
     @Path("/entryDetails")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getForecastEntries(@Context HttpServletRequest request) {
-        Integer userId = sessionManager.getLoggedUserId(request);
+        int userId = sessionManager.getLoggedUserId(request);
         return productForecastService.getForecastEntries(userId);
     }
 
@@ -49,18 +50,20 @@ public class ForecastResource {
     @Path("/addEntry")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addForecastEntry(@Context HttpServletRequest request, ProductForecastDTO productForecastDTO) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productForecastService.addForecastEntry(productForecastDTO, userId);
+    public Response addForecastEntry(@Context HttpServletRequest request, @ValidProductForecastRequest ProductForecastRequest pfRequest) {
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productForecastService.addForecastEntry(pfRequest, userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 
     @PUT
     @Path("/updateEntry")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateForecastEntry(@Context HttpServletRequest request, List<ProductForecast> productForecastList) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productForecastService.updateForecastEntries(productForecastList, userId);
+    public Response updateForecastEntry(@Context HttpServletRequest request, @ValidProductForecastRequest List<ProductForecastRequest> productForecastList) {
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productForecastService.updateForecastEntries(productForecastList, userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 
     @PUT
@@ -68,7 +71,8 @@ public class ForecastResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteForecastEntry(@Context HttpServletRequest request, @PathParam("productForecastId") List<Integer> productForecastId) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productForecastService.deleteForecastEntry(productForecastId, userId);
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productForecastService.deleteForecastEntry(productForecastId, userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 }

@@ -1,21 +1,18 @@
 package com.itavery.forecast.dao.demand;
 
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.domain.assemblers.DemandAssembler;
-import com.itavery.forecast.domain.mithra.annotation.Transactional;
-import com.itavery.forecast.domain.mithra.product.ProductDemandDB;
-import com.itavery.forecast.domain.mithra.product.ProductDemandDBFinder;
-import com.itavery.forecast.domain.mithra.product.ProductDemandDBList;
-import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.product.ProductDemand;
-import com.itavery.forecast.product.ProductDemandDTO;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.domain.adaptors.DemandAdaptor;
+import com.itavery.forecast.domain.mongodb.MongoDBBase;
+import com.itavery.forecast.request.ProductDemandRequest;
+import com.itavery.forecast.response.ProductDemandResponse;
+import com.itavery.forecast.utils.exceptions.DAOException;
+import com.mongodb.DBObject;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,26 +22,25 @@ import java.util.List;
  */
 
 @Repository
-public class ProductDemandDAOImpl implements ProductDemandDAO, Constants{
+public class ProductDemandDAOImpl implements ProductDemandDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductDemandDAOImpl.class);
-    private DemandAssembler demandAssembler;
+
+    private MongoDBBase mongoDBBase;
 
     @Inject
-    public void setDemandAssembler(DemandAssembler demandAssembler) {
-        this.demandAssembler = demandAssembler;
+    public void setMongoDBBase(MongoDBBase mongoDBBase) {
+        this.mongoDBBase = mongoDBBase;
     }
 
     @Override
-    @Transactional
-    public String addDemandEntry(Integer userId, ProductDemandDTO productDemandDTO) throws DAOException {
+    public String addDemandEntry(int userId, ProductDemandRequest pdRequest) throws DAOException {
         LOGGER.info("Starting session factory for adding demand entries");
         try {
-            ProductDemandDB productDemand = demandAssembler.covertToDB(productDemandDTO);
-            productDemand.setUserId(userId);
-            productDemand.cascadeInsert();
-            return PRODUCT_DEMAND_ADD_ENTRY_SUCCESS;
-        } catch (DAOException e) {
+            DBObject dbObject = DemandAdaptor.toNewDBObject(pdRequest);
+            mongoDBBase.insertDocument(Constants.PRODUCT_DEMAND_MONGO_COLLECTION, dbObject);
+            return Constants.PRODUCT_DEMAND_ADD_ENTRY_SUCCESS;
+        } catch (Exception e) {
             LOGGER.error("Could not add demand entry for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not add entry");
@@ -52,66 +48,39 @@ public class ProductDemandDAOImpl implements ProductDemandDAO, Constants{
     }
 
     @Override
-    public ProductDemandDTO getDemandEntry(Integer productDemandId) throws DAOException {
+    public ProductDemandResponse getDemandEntry(int productDemandId) throws DAOException {
         LOGGER.info("Starting session factory for retrieving single demand entry for entry {}", productDemandId);
-        ProductDemandDTO productDemandDto = null;
         try {
-            ProductDemandDB productDemandEntry = fetchProductDemandByDemandId(productDemandId);
-            LOGGER.info("Retrieved demand entry for demand entry id {}", productDemandId);
-            if (productDemandEntry != null) {
-                productDemandDto = demandAssembler.covertToDTO(productDemandEntry);
-                LOGGER.info("Demand entry retrieved for id {}", productDemandId);
-            } else {
-                LOGGER.error("Demand entry not found based on userId");
-            }
-        } catch (DAOException e) {
+            return mongoDBBase.getDocumentById(ProductDemandResponse.class, Constants.PRODUCT_DEMAND_MONGO_COLLECTION, productDemandId);
+        } catch (Exception e) {
             LOGGER.error("Could not fetch entry for demandId {}", productDemandId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not get entry");
         }
-        return productDemandDto;
     }
 
     @Override
-    public List<ProductDemandDTO> getUserDemandEntries(Integer userId) throws DAOException {
-        List<ProductDemandDTO> productDemandDtoList = new ArrayList<>();
+    public List<ProductDemandResponse> getUserDemandEntries(int userId) throws DAOException {
         LOGGER.info("Starting session factory for retrieving demand entries for user {}", userId);
         try {
-            LOGGER.info("Retrieving list of demand entries");
-            ProductDemandDBList productDemandDBList = fetchProductDemandListByUserId(userId);
-            if (!productDemandDBList.isEmpty()) {
-                for (ProductDemandDB productDemandDB : productDemandDBList) {
-                    ProductDemandDTO productDemandDTO = demandAssembler.covertToDTO(productDemandDB);
-                    productDemandDtoList.add(productDemandDTO);
-                    LOGGER.info("Retrieved demand entry for demand id {}", productDemandDB.getProductDemandId());
-                }
-            } else {
-                LOGGER.error("User id not found so could not retrieve demand entries");
-            }
-        } catch (DAOException e) {
+            return mongoDBBase.getListOfDocumentsByKey(ProductDemandResponse.class, Constants.PRODUCT_DEMAND_MONGO_COLLECTION, "userId", userId);
+        } catch (Exception e) {
             LOGGER.error("Could not fetch demand entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not get list of demand entries");
         }
-        return productDemandDtoList;
     }
 
+
     @Override
-    @Transactional
-    public void updateDemandEntry(List<ProductDemand> productDemandList, Integer userId) throws DAOException {
+    public void updateDemandEntry(List<ProductDemandRequest> pdRequest, int userId) throws DAOException {
         LOGGER.info("Starting session to update demand entry for user: {}", userId);
         try {
-            for (ProductDemand productDemand : productDemandList) {
-                ProductDemandDB productDemandDB = fetchProductDemandByIds(productDemand.getProductDemandId(), userId);
-                productDemandDB.setEntryDate(productDemand.getEntryDate());
-                productDemandDB.setProductCode(productDemand.getProductCode());
-                productDemandDB.setWarehouse(productDemand.getWarehouse());
-                productDemandDB.setProductCategory(productDemand.getProductCategory());
-                productDemandDB.setOrderDemand(productDemand.getOrderDemand());
-                productDemandDB.setUserId(productDemand.getUserId());
-                LOGGER.info("updated demand entries for user {} and demand entry {}", userId, productDemand.getProductDemandId());
-            }
-        } catch (DAOException e) {
+            List<ProductDemandRequest> oldProductDemand = mongoDBBase.getListOfDocumentsByKey(ProductDemandRequest.class, Constants.PRODUCT_DEMAND_MONGO_COLLECTION,
+                    "userId", userId);
+            pdRequest.forEach(request -> oldProductDemand.forEach(oldRequest ->
+                    mongoDBBase.updateDocument(Constants.PRODUCT_DEMAND_MONGO_COLLECTION, DemandAdaptor.toDBObject(oldRequest), DemandAdaptor.toDBObject(request))));
+        } catch (Exception e) {
             LOGGER.error("Could not update demand entry for user {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Demand DAO Error: Could not update demand entry");
@@ -119,41 +88,15 @@ public class ProductDemandDAOImpl implements ProductDemandDAO, Constants{
     }
 
     @Override
-    @Transactional
     public String removeDemandEntry(List<Integer> productDemandId) throws DAOException {
-        LOGGER.info("Starting session to remove demand entry");
-        String message = null;
+        LOGGER.info("Starting session to remove demand entries for {}", productDemandId.toString());
         try {
-            LOGGER.info("Demand entries to be removed {}", productDemandId);
-            for (Integer demandId : productDemandId) {
-                ProductDemandDB productDemandDB = fetchProductDemandByDemandId(demandId);
-                if (productDemandDB != null) {
-                    LOGGER.info("Removing entry: " + demandId);
-                    productDemandDB.terminate();
-                    message = PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
-
-                } else {
-                    LOGGER.error("No entry found for id: {}, continuing operations...", demandId);
-                }
-            }
-        } catch (DAOException e) {
+            productDemandId.forEach(id -> mongoDBBase.deleteDocument(Constants.PRODUCT_DEMAND_MONGO_COLLECTION, id));
+            return Constants.PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
+        } catch (Exception e) {
             LOGGER.error("Could not remove demand entry for demandId {}", productDemandId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,  "Product Demand DAO Error: Could not remove demand entry");
         }
-        return message;
-    }
-
-    private ProductDemandDB fetchProductDemandByDemandId(Integer productDemandId) {
-        return ProductDemandDBFinder.findOne(ProductDemandDBFinder.productDemandId().eq(productDemandId));
-    }
-
-    private ProductDemandDB fetchProductDemandByIds(Integer productDemandId, Integer userId) {
-        return ProductDemandDBFinder.findOne(ProductDemandDBFinder.productDemandId().eq(productDemandId)
-                .and(ProductDemandDBFinder.userId().eq(userId)));
-    }
-
-    private ProductDemandDBList fetchProductDemandListByUserId(Integer userId) {
-        return ProductDemandDBFinder.findMany(ProductDemandDBFinder.userId().eq(userId));
     }
 }

@@ -1,17 +1,20 @@
 package com.itavery.forecast.dao.verification;
 
-import com.itavery.forecast.constants.AccountStatusType;
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.domain.mithra.annotation.Transactional;
-import com.itavery.forecast.domain.mithra.user.AccountStatusDB;
-import com.itavery.forecast.domain.mithra.user.AccountStatusDBFinder;
-import com.itavery.forecast.domain.mithra.user.EmailTokenDB;
-import com.itavery.forecast.domain.mithra.user.EmailTokenDBFinder;
-import com.itavery.forecast.exceptions.DAOException;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.domain.adaptors.AccountStatusAdaptor;
+import com.itavery.forecast.domain.adaptors.EmailTokenAdaptor;
+import com.itavery.forecast.domain.mongodb.MongoDBBase;
+import com.itavery.forecast.functional.AccountStatusType;
+import com.itavery.forecast.user.AccountStatus;
+import com.itavery.forecast.user.EmailToken;
+import com.itavery.forecast.utils.exceptions.DAOException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
+
+import javax.inject.Inject;
 
 /**
  * @author Avery Grimes-Farrow
@@ -20,52 +23,56 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public class VerificationDAOImpl implements VerificationDAO, Constants {
+public class VerificationDAOImpl implements VerificationDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(VerificationDAOImpl.class);
 
+    private MongoDBBase mongoDBBase;
+
+    @Inject
+    public void setMongoDBBase(MongoDBBase mongoDBBase) {
+        this.mongoDBBase = mongoDBBase;
+    }
+
     @Override
-    @Transactional
     public void storeToken(String token, String email){
-        try{
-            EmailTokenDB emailTokenDB = new EmailTokenDB();
-            emailTokenDB.setEmail(email);
-            emailTokenDB.setToken(token);
-            emailTokenDB.insert();
-        }
-        catch(Exception e){
-            LOGGER.error("");
-            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "");
+        try {
+            EmailToken emailToken = new EmailToken();
+            emailToken.setEmail(email);
+            emailToken.setToken(token);
+            mongoDBBase.insertDocument(Constants.EMAIL_TOKEN_MONGO_COLLECTION, EmailTokenAdaptor.toDBObject(emailToken));
+        } catch (Exception e) {
+            LOGGER.error("Could not store token for email {}", email);
+            LOGGER.error(e.getMessage(), e);
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Verification DAO Error: Could not store token for email");
         }
     }
 
     @Override
     public String retrieveEmail(String token){
-        try{
-            EmailTokenDB emailTokenDB = EmailTokenDBFinder.findOne(EmailTokenDBFinder.token().eq(token));
-            if(emailTokenDB == null){
-                LOGGER.error("Could not locate email with token {}", token);
-                throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, "Verification token did not match against any e-mail");
-            }
-            return emailTokenDB.getEmail();
-        }
-        catch(Exception e){
-            LOGGER.error("Error attempting to fetch email");
-            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Error attempting to fetch email");
+        try {
+            EmailToken emailToken = mongoDBBase.getDocumentByKey(EmailToken.class, Constants.EMAIL_TOKEN_MONGO_COLLECTION, "token", token);
+            return emailToken.getEmail();
+        } catch (Exception e) {
+            LOGGER.error("Could not retrieve email address using token {}", token);
+            LOGGER.error(e.getMessage(), e);
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Verification DAO Error: could not find email");
         }
     }
 
     @Override
-    @Transactional
     public String updateAccountStatus(String email) throws DAOException {
         try {
-            AccountStatusDB accountStatusDB = AccountStatusDBFinder.findOne(AccountStatusDBFinder.user().email().eq(email));
-            if (accountStatusDB != null) {
-                Character status = accountStatusDB.getStatus();
-                if (status.equals(AccountStatusType.ACTIVE.getCode())) {
-                    accountStatusDB.setEmailVerified(true);
-                    accountStatusDB.setActiveAndVerified(true);
-                    return VERIFICATION_EMAIL_VERIFICATION_SUCCESSFUL;
+            AccountStatus oldAccountStatus = mongoDBBase.getDocumentById(AccountStatus.class, Constants.ACCOUNT_STATUS_MONGO_COLLECTION, email);
+            if(oldAccountStatus != null){
+                char status =  oldAccountStatus.getStatus();
+                if(status  == AccountStatusType.ACTIVE.getCode()){
+                    AccountStatus accountStatus = new AccountStatus();
+                    accountStatus.setEmailVerified(BooleanUtils.toInteger(true));
+                    accountStatus.setActiveAndVerified(BooleanUtils.toInteger(true));
+                    mongoDBBase.updateDocument(Constants.ACCOUNT_STATUS_MONGO_COLLECTION,
+                            AccountStatusAdaptor.toDBObject(oldAccountStatus), AccountStatusAdaptor.toDBObject(accountStatus));
+                    return Constants.VERIFICATION_EMAIL_VERIFICATION_SUCCESSFUL;
                 }
             }
             LOGGER.error("No verification token found");

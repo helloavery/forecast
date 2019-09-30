@@ -1,7 +1,9 @@
 package com.itavery.forecast.user;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * @author Avery Grimes-Farrow
@@ -11,41 +13,34 @@ import java.util.Objects;
 
 public class AccountStatus implements Serializable {
 
-    private Integer accountStatusId;
-    private Character status;
-    private Character emailVerified;
-    private Integer userId;
+    private static final long serialVersionUID = 5136001430949506792L;
+
+    private char status;
+    private int emailVerified;
+    private int userId;
     private int activeAndVerified;
 
-    public Integer getAccountStatusId() {
-        return accountStatusId;
-    }
-
-    public void setAccountStatusId(Integer accountStatusId) {
-        this.accountStatusId = accountStatusId;
-    }
-
-    public Character getStatus() {
+    public char getStatus() {
         return status;
     }
 
-    public void setStatus(Character status) {
+    public void setStatus(char status) {
         this.status = status;
     }
 
-    public Character getEmailVerified() {
+    public int getEmailVerified() {
         return emailVerified;
     }
 
-    public void setEmailVerified(Character emailVerified) {
+    public void setEmailVerified(int emailVerified) {
         this.emailVerified = emailVerified;
     }
 
-    public Integer getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -57,27 +52,29 @@ public class AccountStatus implements Serializable {
         this.activeAndVerified = activeAndVerified;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
+        if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (o == null || getClass() != o.getClass()) return false;
 
-        AccountStatus accountStatus = (AccountStatus) o;
-        return Objects.equals(accountStatusId, accountStatus.getAccountStatusId()) &&
-                Objects.equals(status, accountStatus.getStatus()) &&
-                Objects.equals(emailVerified, accountStatus.getEmailVerified()) &&
-                Objects.equals(userId, accountStatus.getUserId()) &&
-                Objects.equals(activeAndVerified, accountStatus.getActiveAndVerified());
+        AccountStatus that = (AccountStatus) o;
+
+        return new EqualsBuilder()
+                .append(userId, that.userId)
+                .append(activeAndVerified, that.activeAndVerified)
+                .append(status, that.status)
+                .append(emailVerified, that.emailVerified)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accountStatusId, status, emailVerified, userId, activeAndVerified);
+        return new HashCodeBuilder(17, 37)
+                .append(status)
+                .append(emailVerified)
+                .append(userId)
+                .append(activeAndVerified)
+                .toHashCode();
     }
 }

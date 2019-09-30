@@ -4,11 +4,11 @@ import com.authy.AuthyApiClient;
 import com.authy.AuthyException;
 import com.authy.api.Token;
 import com.authy.api.User;
-import com.itavery.forecast.constants.AuthyOtpMethod;
-import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.functional.AuthyOtpMethod;
 import com.itavery.forecast.interaction.client.ClientRestManager;
-import com.itavery.forecast.user.RegistrationDTO;
-import com.itavery.forecast.user.UserDTO;
+import com.itavery.forecast.response.AuthyResponse;
+import com.itavery.forecast.response.UserResponse;
 import com.twilio.http.TwilioRestClient;
 import com.twilio.rest.api.v2010.account.MessageCreator;
 import com.twilio.type.PhoneNumber;
@@ -50,22 +50,22 @@ public class AuthyServiceImpl implements AuthyService{
         this.authyClient = authyClient;
     }
 
-    public Integer createAuthyUser(RegistrationDTO user) throws AuthyException {
+    public Integer createAuthyUser(String email, String countryCode, String phoneNumber) throws AuthyException {
         try{
-            User authyUser = authyApiClient.getUsers().createUser(user.getEmail(),user.getPhoneNumber(),user.getCountryCode());
+            User authyUser = authyApiClient.getUsers().createUser(email, phoneNumber, countryCode);
             if(authyUser.isOk()){
                 int authyUserId = authyUser.getId();
                 authyApiClient.getUsers().requestSms(authyUserId);
                 return authyUserId;
             }
             else{
-                LOGGER.error("Could not create authy user using e-mail {} and phone number {}-{}", user.getEmail(), user.getCountryCode(), user.getPhoneNumber());
+                LOGGER.error("Could not create authy user using e-mail {} and phone number {}-{}", email, countryCode, phoneNumber);
                 throw new RuntimeException("Could not create authy user");
             }
         }
         catch(AuthyException e){
-            LOGGER.error("Error creating authy user for user {}", user.getEmail() + e.getMessage());
-            throw new RuntimeException("Error creating authy user for user: " + user.getEmail(), e);
+            LOGGER.error("Error creating authy user for user {}", email + e.getMessage());
+            throw new RuntimeException("Error creating authy user for user: " + email, e);
         }
     }
 
@@ -84,7 +84,7 @@ public class AuthyServiceImpl implements AuthyService{
         }
     }
 
-    public boolean requestAuthyOTP(HttpServletRequest request, UserDTO userDTO, AuthyOtpMethod authyOtpMethod){
+    public boolean requestAuthyOTP(HttpServletRequest request, UserResponse userDTO, AuthyOtpMethod authyOtpMethod){
         try{
             AuthyResponse authyResponse = null;
             int userId = userDTO.getUserId();
@@ -95,9 +95,6 @@ public class AuthyServiceImpl implements AuthyService{
                     break;
                 case VOICE:
                     authyResponse = authyClient.sendVoiceOTP("", authyId);
-                    break;
-                default:
-                    authyResponse = authyClient.sendSMSOTP("", authyId);
                     break;
             }
             partialLogIn(request, userId);

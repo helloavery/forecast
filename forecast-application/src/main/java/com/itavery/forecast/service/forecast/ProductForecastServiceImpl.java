@@ -1,15 +1,15 @@
 package com.itavery.forecast.service.forecast;
 
-import com.itavery.forecast.ResponseBuilder;
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.constants.ProductType;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.dao.forecast.ProductForecastDAO;
-import com.itavery.forecast.exceptions.ServiceException;
-import com.itavery.forecast.product.ProductForecast;
-import com.itavery.forecast.product.ProductForecastDTO;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.functional.ProductType;
+import com.itavery.forecast.request.ProductForecastRequest;
+import com.itavery.forecast.response.ProductForecastResponse;
 import com.itavery.forecast.service.audit.AuditService;
-import com.itavery.forecast.validator.ProductForecastValidator;
+import com.itavery.forecast.utils.ResponseBuilder;
+import com.itavery.forecast.utils.exceptions.ServiceException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -30,29 +30,24 @@ public class ProductForecastServiceImpl implements ProductForecastService {
     private final static Logger LOGGER = LogManager.getLogger(ProductForecastServiceImpl.class);
     private AuditService auditService;
     private ProductForecastDAO productForecastDAO;
-    private ProductForecastValidator productForecastValidator;
-
-    @Inject
-    public ProductForecastServiceImpl(ProductForecastDAO productForecastDAO, ProductForecastValidator productForecastValidator){
-        this.productForecastDAO = productForecastDAO;
-        this.productForecastValidator = productForecastValidator;
-    }
 
     @Inject
     public void setAuditService(AuditService auditService) {
         this.auditService = auditService;
     }
 
+    @Inject
+    public void setProductForecastDAO(ProductForecastDAO productForecastDAO) {
+        this.productForecastDAO = productForecastDAO;
+    }
+
     @Override
-    public Response addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException {
+    public Response addForecastEntry(ProductForecastRequest pfRequest, Integer userId) throws ServiceException {
         try {
-            LOGGER.info("Validating forecast entry for user {}", userId);
-            productForecastValidator.validate(productForecast);
+            String returnMessage = productForecastDAO.addForecastEntry(userId, pfRequest);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.FORECAST);
-
             LOGGER.info("Attempting to add forecast entry for user {}", userId);
-            String returnMessage = productForecastDAO.addForecastEntry(userId, productForecast);
             return ResponseBuilder.createSuccessResponse(returnMessage);
         } catch (Exception e) {
             LOGGER.error("Could not add forecast entry for user {}", userId);
@@ -64,8 +59,8 @@ public class ProductForecastServiceImpl implements ProductForecastService {
     @Override
     public Response getForecastEntries(Integer userId) throws ServiceException {
         LOGGER.info("Attempting to get forecast entries for user {}", userId);
-        List<ProductForecastDTO> productForecastDtoList = productForecastDAO.getForecastEntries(userId);
-        if (productForecastDtoList.isEmpty()) {
+        List<ProductForecastResponse> productForecastDtoList = productForecastDAO.getForecastEntries(userId);
+        if (CollectionUtils.isEmpty(productForecastDtoList)) {
             return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         } else {
             return ResponseBuilder.createSuccessResponse(productForecastDtoList);
@@ -73,12 +68,8 @@ public class ProductForecastServiceImpl implements ProductForecastService {
     }
 
     @Override
-    public Response updateForecastEntries(List<ProductForecast> productForecastList, Integer userId) throws ServiceException {
+    public Response updateForecastEntries(List<ProductForecastRequest> productForecastList, Integer userId) throws ServiceException {
         try {
-            for (ProductForecast productForecast : productForecastList) {
-                LOGGER.info("Validating entries for forecast id {}", productForecast.getProductForecastId());
-                productForecastValidator.validate(productForecast);
-            }
             LOGGER.info("Attempting to update forecast entries for user{}", userId);
             String returnMessage = productForecastDAO.updateForecastEntries(productForecastList, userId);
             //TODO: Implement Audit Service

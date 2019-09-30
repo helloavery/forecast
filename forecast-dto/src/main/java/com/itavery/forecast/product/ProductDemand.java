@@ -12,6 +12,8 @@ import java.util.Objects;
 
 public class ProductDemand implements Serializable {
 
+    private static final long serialVersionUID = 2180418769599045567L;
+
     private Integer productDemandId;
     private String productCode;
     private String warehouse;

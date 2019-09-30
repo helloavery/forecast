@@ -1,6 +1,6 @@
 package com.itavery.forecast.interaction.client;
 
-import com.itavery.forecast.external.AuthyResponse;
+import com.itavery.forecast.response.AuthyResponse;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

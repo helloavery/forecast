@@ -1,21 +1,18 @@
 package com.itavery.forecast.dao.forecast;
 
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.domain.assemblers.ForecastAssembler;
-import com.itavery.forecast.domain.mithra.annotation.Transactional;
-import com.itavery.forecast.domain.mithra.product.ProductForecastDB;
-import com.itavery.forecast.domain.mithra.product.ProductForecastDBFinder;
-import com.itavery.forecast.domain.mithra.product.ProductForecastDBList;
-import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.product.ProductForecast;
-import com.itavery.forecast.product.ProductForecastDTO;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.domain.adaptors.ForecastAdaptor;
+import com.itavery.forecast.domain.mongodb.MongoDBBase;
+import com.itavery.forecast.request.ProductForecastRequest;
+import com.itavery.forecast.response.ProductForecastResponse;
+import com.itavery.forecast.utils.exceptions.DAOException;
+import com.mongodb.DBObject;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,26 +22,25 @@ import java.util.List;
  */
 
 @Repository
-public class ProductForecastDAOImpl implements ProductForecastDAO, Constants {
+public class ProductForecastDAOImpl implements ProductForecastDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(ProductForecastDAOImpl.class);
-    private ForecastAssembler forecastAssembler;
+
+    private MongoDBBase mongoDBBase;
 
     @Inject
-    public void setForecastAssembler(ForecastAssembler forecastAssembler) {
-        this.forecastAssembler = forecastAssembler;
+    public void setMongoDBBase(MongoDBBase mongoDBBase) {
+        this.mongoDBBase = mongoDBBase;
     }
 
     @Override
-    @Transactional
-    public String addForecastEntry(Integer userId, ProductForecastDTO productForecastDTO) throws DAOException {
+    public String addForecastEntry(Integer userId, ProductForecastRequest pfRequest) throws DAOException {
         LOGGER.info("Starting session factory for adding forecast entries");
         try {
-            ProductForecastDB productForecastDB = forecastAssembler.covertToProductForecastDB(productForecastDTO);
+            DBObject dbObject = ForecastAdaptor.toNewDBObject(pfRequest);
+            mongoDBBase.insertDocument(Constants.PRODUCT_FORECAST_MONGO_COLLECTION, dbObject);
             LOGGER.info("Adding forecast entry for userId {}", userId);
-            productForecastDB.setUserId(userId);
-            productForecastDB.cascadeInsert();
-            return PRODUCT_FORECAST_ADD_ENTRY_SUCCESS;
+            return Constants.PRODUCT_FORECAST_ADD_ENTRY_SUCCESS;
         } catch (DAOException e) {
             LOGGER.error("Could not add forecast entry/entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
@@ -53,105 +49,44 @@ public class ProductForecastDAOImpl implements ProductForecastDAO, Constants {
     }
 
     @Override
-    public List<ProductForecastDTO> getForecastEntries(Integer userId) throws DAOException {
-        List<ProductForecastDTO> productForecastDtoList = new ArrayList<>();
+    public List<ProductForecastResponse> getForecastEntries(Integer userId) throws DAOException {
         LOGGER.info("Starting session factory for getting forecast entries");
         try {
-            LOGGER.info("Retrieving list of forecast entries");
-            ProductForecastDBList productForecastDBList = fetchProductForecastListByUserId(userId);
-            if (!productForecastDBList.isEmpty()) {
-                for (ProductForecastDB productForecastDB : productForecastDBList) {
-                    ProductForecastDTO productForecastDto = forecastAssembler.covertProductForecastToDTO(productForecastDB);
-                    productForecastDtoList.add(productForecastDto);
-                }
-            } else {
-                LOGGER.error("Could not retrieve product forecast entries, user not found for {}", userId);
-            }
+            return  mongoDBBase.getListOfDocumentsByKey(ProductForecastResponse.class, Constants.PRODUCT_FORECAST_MONGO_COLLECTION, "userId", userId);
         } catch (DAOException e) {
             LOGGER.error("Could not get forecast entries for userId {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Product Forecast DAO Error: Could not get forecast entries");
         }
-        return productForecastDtoList;
     }
 
     @Override
-    @Transactional
-    public String updateForecastEntries(List<ProductForecast> productForecastList, Integer userId) throws DAOException {
+    public String updateForecastEntries(List<ProductForecastRequest> productForecastList, Integer userId) throws DAOException {
         LOGGER.info("Starting session factory for updating forecast entries");
-        String returnMessage;
         try {
-            for (ProductForecast productForecast : productForecastList) {
-                ProductForecastDB productForecastDB = fetchProductForecastByIds(productForecast.getProductForecastId(), userId);
-                productForecastDB.setSku(productForecast.getSku());
-                productForecastDB.setNationalInventory(productForecast.getNationalInventory());
-                productForecastDB.setLeadTime(productForecast.getLeadTime());
-                productForecastDB.setInTransitQty(productForecast.getInTransitQty());
-                productForecastDB.setForecastThreeMonths(productForecast.getForecastThreeMonths());
-                productForecastDB.setForecastSixMonths(productForecast.getForecastSixMonths());
-                productForecastDB.setForecastNineMonths(productForecast.getForecastNineMonths());
-                productForecastDB.setSalesOneMonth(productForecast.getSalesOneMonth());
-                productForecastDB.setSalesThreeMonths(productForecast.getSalesThreeMonths());
-                productForecastDB.setSalesSixMonths(productForecast.getSalesSixMonths());
-                productForecastDB.setSalesNineMonths(productForecast.getSalesNineMonths());
-                productForecastDB.setMinBank(productForecast.getMinBank());
-                productForecastDB.setPotentialIssues(productForecast.getPotentialIssues());
-                productForecastDB.setPiecesPastDue(productForecast.getPiecesPastDue());
-                productForecastDB.setPerfSixMonthAvg(productForecast.getPerfSixMonthAvg());
-                productForecastDB.setPerfTwelveMonthAvg(productForecast.getPerfTwelveMonthAvg());
-                productForecastDB.setLocalBoQty(productForecast.getLocalBoQty());
-                productForecastDB.setDeckRisk(productForecast.getDeckRisk());
-                productForecastDB.setOeConstraint(productForecast.getOeConstraint());
-                productForecastDB.setPpapRisk(productForecast.getPpapRisk());
-                productForecastDB.setStopAutoBuy(productForecast.getStopAutoBuy());
-                productForecastDB.setRevStop(productForecast.getRevStop());
-                productForecastDB.setBackorder(productForecast.getBackorder());
-                productForecastDB.setUserId(userId);
-                LOGGER.info("Updated forecast entry {}", productForecast.getProductForecastId());
-            }
-            returnMessage = PRODUCT_FORECAST_SUCCESSFUL_UPDATE;
+            List<ProductForecastRequest> oldProductForecast = mongoDBBase.getListOfDocumentsByKey(ProductForecastRequest.class, Constants.PRODUCT_FORECAST_MONGO_COLLECTION,
+                    "userId", userId);
+            productForecastList.forEach(request -> oldProductForecast.forEach(oldRequest ->
+                    mongoDBBase.updateDocument(Constants.PRODUCT_FORECAST_MONGO_COLLECTION, ForecastAdaptor.toDBObject(oldRequest), ForecastAdaptor.toDBObject(request))));
             LOGGER.info("updated demand entries for user {}", userId);
+            return Constants.PRODUCT_FORECAST_SUCCESSFUL_UPDATE;
         } catch (DAOException e) {
             LOGGER.error("Could not update forecast entries for forecast id {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Product Forecast DAO Error: Could not update forecast entry");
         }
-        return returnMessage;
     }
 
     @Override
-    @Transactional
-    @SuppressWarnings("Duplicates")
     public String deleteForecastEntry(List<Integer> productForecastId) throws DAOException {
         LOGGER.info("Starting session factory for deleting forecast entries");
-        String returnMessage;
         try {
-            for (Integer entryToBeRemoved : productForecastId) {
-                ProductForecastDB productForecastDB = fetchProductForecastByForecastId(entryToBeRemoved);
-                if (productForecastDB != null) {
-                    LOGGER.info("Demand entries to be removed {}", entryToBeRemoved);
-                    productForecastDB.terminate();
-                }
-            }
-            returnMessage = PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
+            productForecastId.forEach(id -> mongoDBBase.deleteDocument(Constants.PRODUCT_FORECAST_MONGO_COLLECTION, id));
+            return Constants.PRODUCT_FORECAST_REMOVE_ENTRY_SUCCESSFUL;
         } catch (DAOException e) {
             LOGGER.error("Could not delete forecast entry for forecast entry {}", productForecastId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Product Forecast DAO Error: Could not remove delete entry");
         }
-        return returnMessage;
-    }
-
-    private ProductForecastDB fetchProductForecastByForecastId(Integer productForecastId) {
-        return ProductForecastDBFinder.findOne(ProductForecastDBFinder.productForecastId().eq(productForecastId));
-    }
-
-    private ProductForecastDB fetchProductForecastByIds(Integer productForecastId, Integer userId) {
-        return ProductForecastDBFinder.findOne(ProductForecastDBFinder.productForecastId().eq(productForecastId)
-                .and(ProductForecastDBFinder.userId().eq(userId)));
-    }
-
-    private ProductForecastDBList fetchProductForecastListByUserId(Integer userId) {
-        return ProductForecastDBFinder.findMany(ProductForecastDBFinder.userId().eq(userId));
     }
 }

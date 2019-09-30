@@ -1,20 +1,21 @@
 package com.itavery.forecast.service.user;
 
-import com.itavery.forecast.ResponseBuilder;
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.Constants;
+import com.averygrimes.core.pojo.EmailNotificationRequest;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.dao.user.UserDAO;
-import com.itavery.forecast.exceptions.ServiceException;
 import com.itavery.forecast.external.AuthyService;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.request.LoginRequest;
+import com.itavery.forecast.request.RegistrationRequest;
+import com.itavery.forecast.response.UserResponse;
 import com.itavery.forecast.service.audit.AuditService;
-import com.itavery.forecast.service.email.EmailService;
+import com.itavery.forecast.kafka.KafkaMessageSender;
 import com.itavery.forecast.service.verification.VerificationService;
-import com.itavery.forecast.session.SessionManager;
-import com.itavery.forecast.user.LoginDTO;
-import com.itavery.forecast.user.RegistrationDTO;
 import com.itavery.forecast.user.User;
-import com.itavery.forecast.user.UserDTO;
-import com.itavery.forecast.validator.UserValidator;
+import com.itavery.forecast.utils.ResponseBuilder;
+import com.itavery.forecast.utils.UUIDUtils;
+import com.itavery.forecast.utils.exceptions.ServiceException;
+import com.itavery.forecast.utils.session.SessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -39,18 +40,9 @@ public class UserServiceImpl implements UserService {
     private SessionManager sessionManager;
     private AuditService auditService;
     private UserDAO userDAO;
-    private UserValidator userValidator;
-    private EmailService emailService;
     private VerificationService verificationService;
     private AuthyService authyService;
-
-    @Inject
-    public UserServiceImpl(UserDAO userDAO, EmailService emailService, VerificationService verificationService, AuthyService authyService){
-        this.userDAO = userDAO;
-        this.emailService = emailService;
-        this.verificationService = verificationService;
-        this.authyService = authyService;
-    }
+    private KafkaMessageSender kafkaMessageSender;
 
     @Inject
     public void setSessionManager(SessionManager sessionManager) {
@@ -63,34 +55,48 @@ public class UserServiceImpl implements UserService {
     }
 
     @Inject
-    public void setUserValidator(UserValidator userValidator) {
-        this.userValidator = userValidator;
+    public void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    @Inject
+    public void setVerificationService(VerificationService verificationService) {
+        this.verificationService = verificationService;
+    }
+
+    @Inject
+    public void setAuthyService(AuthyService authyService) {
+        this.authyService = authyService;
+    }
+
+    @Inject
+    public void setKafkaMessageSender(KafkaMessageSender kafkaMessageSender) {
+        this.kafkaMessageSender = kafkaMessageSender;
     }
 
     @Override
-    public Response createUser(HttpServletRequest request, RegistrationDTO registrationDTO) throws ServiceException {
+    public Response createUser(HttpServletRequest request, RegistrationRequest regRequest) throws ServiceException {
         try {
-            LOGGER.info("Validating registration inputs");
-            userValidator.validate(registrationDTO.getEmail(), registrationDTO.getPassword(), registrationDTO.getFirstName(), registrationDTO.getLastName());
             LOGGER.info("Attempting to create user");
-            Integer authyId = authyService.createAuthyUser(registrationDTO);
+            Integer authyId = authyService.createAuthyUser(regRequest.getEmail(), regRequest.getCountryCode(), regRequest.getPhoneNumber());
             if(authyId == null){
-                LOGGER.error("Could not create authy user using e-mail {} and phone number {}-{}", registrationDTO.getEmail(),registrationDTO.getCountryCode(),registrationDTO.getPhoneNumber());
+                LOGGER.error("Could not create authy user using e-mail {} and phone number {}-{}", regRequest.getEmail(), regRequest.getCountryCode(), regRequest.getPhoneNumber());
                 return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_AUTHY_USER_NOT_CREATED);
             }
-            UserDTO userDTO = userDAO.createUser(registrationDTO, authyId);
-            if (userDTO == null) {
-                LOGGER.error("Error creating user");
-                return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_USER_NOT_CREATED);
-            }
-            String emailToken = verificationService.generateToken(registrationDTO.getEmail());
+            int userId = userDAO.createUser(regRequest, authyId);
+            String emailToken = verificationService.generateToken(regRequest.getEmail());
             URI contextUrl = URI.create(request.getRequestURL().toString()).resolve(request.getContextPath());
-            emailService.sendEmailAddressVerificationEmail(contextUrl.toString(), registrationDTO.getEmail(), registrationDTO.getFirstName(), emailToken);
-            auditService.createAudit(registrationDTO.getUsername(), AuditType.ACCOUNT_CREATED, null);
-            auditService.createAudit(registrationDTO.getUsername(), AuditType.ACCOUNT_ACTIVATED, null);
-            partialLogIn(request, userDTO.getUserId());
-            LOGGER.info("Successfully completed addition of new user {} : {}", registrationDTO.getUsername(),registrationDTO.getEmail());
-            return ResponseBuilder.createSuccessResponse(userDTO);
+            EmailNotificationRequest emailNotificationRequest = new EmailNotificationRequest();
+            emailNotificationRequest.setContextURL(contextUrl.toString());
+            emailNotificationRequest.setRecipientEmailAddress(regRequest.getEmail());
+            emailNotificationRequest.setRecipientName(regRequest.getFirstName());
+            emailNotificationRequest.setEmailToken(emailToken);
+            kafkaMessageSender.sendEmailNotificationMessage(emailNotificationRequest);
+            auditService.createAudit(regRequest.getUsername(), AuditType.ACCOUNT_CREATED, null);
+            auditService.createAudit(regRequest.getUsername(), AuditType.ACCOUNT_ACTIVATED, null);
+            partialLogIn(request, userId);
+            LOGGER.info("Successfully completed addition of new user {} : {}", regRequest.getUsername(),regRequest.getEmail());
+            return ResponseBuilder.createSuccessResponse(userId);
         } catch (Exception e) {
             LOGGER.error("Service: Could not register user", e);
             return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR,Constants.SERVICE_CANNOT_REGISTER_USER);
@@ -101,7 +107,7 @@ public class UserServiceImpl implements UserService {
     public Response verifyAuthyUser(HttpServletRequest request, String code){
         try{
             int userId = sessionManager.getLoggedUserId(request);
-            UserDTO userDTO = userDAO.findUser(userId);
+            UserResponse userDTO = userDAO.findUser(userId);
             int authyUserId = userDTO.getAuthyUserId();
             boolean success =  authyService.verifyAuthyUser(request, code, authyUserId);
             return ResponseBuilder.createSuccessResponse(success);
@@ -113,10 +119,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response login(HttpServletRequest request, LoginDTO user){
+    public Response login(HttpServletRequest request, LoginRequest loginRequest){
         try{
-            UserDTO userDTO = userDAO.findUser(user.getEmail());
-            boolean success = authyService.requestAuthyOTP(request, userDTO, user.getAuthyOtpMethod());
+            UserResponse userDTO = userDAO.findUser(loginRequest.getEmail());
+            boolean success = authyService.requestAuthyOTP(request, userDTO, loginRequest.getAuthyOTPMethod());
             return ResponseBuilder.createSuccessResponse(success);
         }
         catch(Exception e){
@@ -129,7 +135,7 @@ public class UserServiceImpl implements UserService {
     public Response verifyOtp(HttpServletRequest request, String token){
         try{
             Integer userId = sessionManager.getLoggedUserId(request);
-            UserDTO userDTO = userDAO.findUser(userId);
+            UserResponse userDTO = userDAO.findUser(userId);
             int authyId = userDTO.getAuthyUserId();
             boolean success =  authyService.verifyAuthyOTP(token, authyId);
             return ResponseBuilder.createSuccessResponse(success);
@@ -141,9 +147,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response findUser(Integer userId) throws ServiceException {
+    public Response findUser(int userId) throws ServiceException {
         LOGGER.info("Attempting to find user {}", userId);
-        UserDTO userDto = userDAO.findUser(userId);
+        UserResponse userDto = userDAO.findUser(userId);
         if (userDto == null) {
             LOGGER.error("Service: Error finding user {}", userId);
             return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
@@ -152,10 +158,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response updateUser(User user, Integer userId) throws ServiceException {
+    public Response updateUser(User user, int userId) throws ServiceException {
         try {
-            LOGGER.info("Validating updated user information for {}", userId);
-            userValidator.validate(user.getEmail(), null, user.getFirstName(), user.getLastName());
             LOGGER.info("Attempting to update user {}", userId);
             userDAO.updateUser(user);
             //TODO: Implement Audit Service
@@ -169,7 +173,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response deactivateUser(Integer userId) throws ServiceException {
+    public Response deactivateUser(int userId) throws ServiceException {
         String returnMessage = null;
         try {
             LOGGER.info("Attempting to deactivate user {}", userId);
@@ -197,8 +201,9 @@ public class UserServiceImpl implements UserService {
         cookie.setSecure(true);
     }
 
-    private void fullLogIn(HttpServletRequest request){
+    private void fullLogIn(HttpServletRequest request) throws Exception{
         HttpSession session = request.getSession();
         session.setAttribute(Constants.AUTHENTICATED, true);
+        session.setAttribute(Constants.SESSION_ID, UUIDUtils.generateType4UUID());
     }
 }

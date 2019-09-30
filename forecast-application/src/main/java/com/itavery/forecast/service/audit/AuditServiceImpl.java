@@ -1,8 +1,8 @@
 package com.itavery.forecast.service.audit;
 
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.ProductType;
 import com.itavery.forecast.dao.audit.AuditDAO;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.functional.ProductType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;

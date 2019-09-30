@@ -1,10 +1,10 @@
 package com.itavery.forecast.service.verification;
 
-import com.itavery.forecast.ResponseBuilder;
-import com.itavery.forecast.constants.AuditType;
 import com.itavery.forecast.dao.verification.VerificationDAO;
 import com.itavery.forecast.external.MailgunEmailVerification;
+import com.itavery.forecast.functional.AuditType;
 import com.itavery.forecast.service.audit.AuditService;
+import com.itavery.forecast.utils.ResponseBuilder;
 import com.mashape.unirest.http.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,9 +29,17 @@ public class VerificationServiceImpl implements VerificationService{
     private MailgunEmailVerification mailgunEmailVerification;
 
     @Inject
-    public VerificationServiceImpl(VerificationDAO verificationDAO, AuditService auditService, MailgunEmailVerification mailgunEmailVerification){
+    public void setVerificationDAO(VerificationDAO verificationDAO) {
         this.verificationDAO = verificationDAO;
+    }
+
+    @Inject
+    public void setAuditService(AuditService auditService) {
         this.auditService = auditService;
+    }
+
+    @Inject
+    public void setMailgunEmailVerification(MailgunEmailVerification mailgunEmailVerification) {
         this.mailgunEmailVerification = mailgunEmailVerification;
     }
 

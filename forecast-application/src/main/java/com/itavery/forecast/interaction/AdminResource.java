@@ -1,9 +1,9 @@
 package com.itavery.forecast.interaction;
 
-import com.itavery.forecast.FileReader;
-import com.itavery.forecast.constants.RoleValues;
-import com.itavery.forecast.external.S3GatewayService;
-import com.itavery.forecast.util.annotation.EntitlementPolicy;
+import com.averygrimes.core.pojo.RoleValues;
+import com.averygrimes.core.service.S3GatewayService;
+import com.averygrimes.core.util.annotation.EntitlementPolicy;
+import com.itavery.forecast.utils.FileReader;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -32,7 +32,7 @@ public class AdminResource {
     HttpServletRequest httpServletRequest;
 
     @Inject
-    public AdminResource(S3GatewayService s3GatewayService){
+    public void setS3GatewayService(S3GatewayService s3GatewayService) {
         this.s3GatewayService = s3GatewayService;
     }
 

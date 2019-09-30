@@ -1,15 +1,15 @@
 package com.itavery.forecast.service.demand;
 
-import com.itavery.forecast.ResponseBuilder;
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.constants.ProductType;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.dao.demand.ProductDemandDAO;
-import com.itavery.forecast.exceptions.ServiceException;
-import com.itavery.forecast.product.ProductDemand;
-import com.itavery.forecast.product.ProductDemandDTO;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.functional.ProductType;
+import com.itavery.forecast.request.ProductDemandRequest;
+import com.itavery.forecast.response.ProductDemandResponse;
 import com.itavery.forecast.service.audit.AuditService;
-import com.itavery.forecast.validator.ProductDemandValidator;
+import com.itavery.forecast.utils.ResponseBuilder;
+import com.itavery.forecast.utils.exceptions.ServiceException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,6 @@ public class ProductDemandServiceImpl implements ProductDemandService {
     private final static Logger LOGGER = LogManager.getLogger(ProductDemandServiceImpl.class);
     private AuditService auditService;
     private ProductDemandDAO productDemandDAO;
-    private ProductDemandValidator productDemandValidator;
 
     @Inject
     public ProductDemandServiceImpl(ProductDemandDAO productDemandDAO){
@@ -42,20 +41,13 @@ public class ProductDemandServiceImpl implements ProductDemandService {
         this.auditService = auditService;
     }
 
-    @Inject
-    public void setProductDemandValidator(ProductDemandValidator productDemandValidator) {
-        this.productDemandValidator = productDemandValidator;
-    }
-
     @Override
-    public Response addDemandEntry(ProductDemandDTO productDemand, Integer userId) throws ServiceException {
+    public Response addDemandEntry(ProductDemandRequest pdRequest, int userId) throws ServiceException {
         try {
-            LOGGER.info("Validating product demand entry/entries for user {}", userId);
-            productDemandValidator.validate(productDemand);
+            String result = productDemandDAO.addDemandEntry(userId, pdRequest);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_ADDED, ProductType.DEMAND);
             LOGGER.info("Attempting to add product entry for user {}", userId);
-            String result = productDemandDAO.addDemandEntry(userId, productDemand);
             return ResponseBuilder.createSuccessResponse(result);
         } catch (Exception e) {
             LOGGER.error("Could not add demand entry for user {}", userId);
@@ -65,47 +57,44 @@ public class ProductDemandServiceImpl implements ProductDemandService {
     }
 
     @Override
-    public Response getDemandEntry(Integer productDemandId) throws ServiceException {
+    public Response getDemandEntry(int productDemandId) throws ServiceException {
         LOGGER.info("Attempting to get product entry: " + productDemandId);
-        ProductDemandDTO productDemandDto = productDemandDAO.getDemandEntry(productDemandId);
-        if (productDemandDto == null) {
+        ProductDemandResponse response = productDemandDAO.getDemandEntry(productDemandId);
+        if (response == null) {
             LOGGER.error("Could not get demand entry for user: " + productDemandId);
             return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_ENTRY_NOT_FOUND);
         }
-        return ResponseBuilder.createSuccessResponse(productDemandDto);
+        return ResponseBuilder.createSuccessResponse(response);
     }
 
     @Override
-    public Response getUserDemandEntries(Integer userId) throws ServiceException {
+    public Response getUserDemandEntries(int userId) throws ServiceException {
         LOGGER.info("Attempting to get product entries for user: " + userId);
-        List<ProductDemandDTO> productDemandDtoList = productDemandDAO.getUserDemandEntries(userId);
-        if (productDemandDtoList.isEmpty()) {
+        List<ProductDemandResponse> productDemandList = productDemandDAO.getUserDemandEntries(userId);
+        if (CollectionUtils.isEmpty(productDemandList)) {
             LOGGER.error("Could not get demand entries for user: " + userId);
             return ResponseBuilder.createFailureResponse(Response.Status.NOT_FOUND, Constants.SERVICE_USER_NOT_FOUND);
         }
-        return ResponseBuilder.createSuccessResponse(productDemandDtoList);
+        return ResponseBuilder.createSuccessResponse(productDemandList);
     }
 
     @Override
-    public Response updateDemandEntry(List<ProductDemand> productDemandList, Integer userId) throws ServiceException {
+    public Response updateDemandEntry(List<ProductDemandRequest> pdRequest, int userId) throws ServiceException {
         try {
-            for (ProductDemand productDemand : productDemandList) {
-                productDemandValidator.validate(productDemand);
-            }
             LOGGER.info("Attempting to update demand entries for user {}", userId);
-            productDemandDAO.updateDemandEntry(productDemandList, userId);
+            productDemandDAO.updateDemandEntry(pdRequest, userId);
             //TODO: Implement Audit Service
             auditService.createAudit(Constants.USERID_PREFIX + userId, AuditType.ENTRY_UPDATED, ProductType.DEMAND);
             return ResponseBuilder.createSuccessResponse();
         } catch (Exception e) {
-            LOGGER.error("Could not update demand entries {}", productDemandList);
+            LOGGER.error("Could not update demand entries {}", pdRequest);
             LOGGER.error(e.getMessage(), e);
             return ResponseBuilder.createFailureResponse(Response.Status.INTERNAL_SERVER_ERROR, Constants.SERVICE_ERROR_UPDATING_ENTRY);
         }
     }
 
     @Override
-    public Response removeDemandEntry(List<Integer> productDemandId, Integer userId) throws ServiceException {
+    public Response removeDemandEntry(List<Integer> productDemandId, int userId) throws ServiceException {
         try {
             LOGGER.info("Attempting to delete demand entry for: " + productDemandId);
             String returnMessage = productDemandDAO.removeDemandEntry(productDemandId);

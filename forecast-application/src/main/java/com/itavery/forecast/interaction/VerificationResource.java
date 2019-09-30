@@ -18,7 +18,7 @@ public class VerificationResource {
     private VerificationService verificationService;
 
     @Inject
-    public VerificationResource(VerificationService verificationService){
+    public void setVerificationService(VerificationService verificationService) {
         this.verificationService = verificationService;
     }
 

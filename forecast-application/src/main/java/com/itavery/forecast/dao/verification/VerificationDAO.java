@@ -1,6 +1,6 @@
 package com.itavery.forecast.dao.verification;
 
-import com.itavery.forecast.exceptions.DAOException;
+import com.itavery.forecast.utils.exceptions.DAOException;
 
 /**
  * @author Avery Grimes-Farrow

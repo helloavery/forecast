@@ -1,8 +1,7 @@
 package com.itavery.forecast.service.forecast;
 
-import com.itavery.forecast.exceptions.ServiceException;
-import com.itavery.forecast.product.ProductForecast;
-import com.itavery.forecast.product.ProductForecastDTO;
+import com.itavery.forecast.request.ProductForecastRequest;
+import com.itavery.forecast.utils.exceptions.ServiceException;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -15,11 +14,11 @@ import java.util.List;
 
 public interface ProductForecastService {
 
-    Response addForecastEntry(ProductForecastDTO productForecast, Integer userId) throws ServiceException;
+    Response addForecastEntry(ProductForecastRequest pfRequest, Integer userId) throws ServiceException;
 
     Response getForecastEntries(Integer userId) throws ServiceException;
 
-    Response updateForecastEntries(List<ProductForecast> productForecastList, Integer userId) throws ServiceException;
+    Response updateForecastEntries(List<ProductForecastRequest> productForecastList, Integer userId) throws ServiceException;
 
     Response deleteForecastEntry(List<Integer> productForecastId, Integer userId) throws ServiceException;
 }

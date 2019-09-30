@@ -1,16 +1,18 @@
 package com.itavery.forecast.dao.audit;
 
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.ProductType;
-import com.itavery.forecast.domain.mithra.annotation.Transactional;
-import com.itavery.forecast.domain.mithra.product.AuditTrailProductDB;
-import com.itavery.forecast.domain.mithra.user.AuditTrailDB;
-import com.itavery.forecast.exceptions.DAOException;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.domain.adaptors.AuditTrailAdaptor;
+import com.itavery.forecast.domain.mongodb.MongoDBBase;
+import com.itavery.forecast.functional.AuditTrail;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.functional.ProductType;
+import com.itavery.forecast.utils.exceptions.DAOException;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -25,16 +27,22 @@ public class AuditDAOImpl implements AuditDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(AuditDAOImpl.class);
 
+    private MongoDBBase mongoDBBase;
+
+    @Inject
+    public void setMongoDBBase(MongoDBBase mongoDBBase) {
+        this.mongoDBBase = mongoDBBase;
+    }
+
     @Override
-    @Transactional
     public void createUserAuditEvent(String username, AuditType auditCode) throws Exception {
         try {
-            AuditTrailDB auditTrail = new AuditTrailDB();
+            AuditTrail auditTrail = new AuditTrail();
             auditTrail.setAuditAction(auditCode.getAuditCode());
             auditTrail.setAuditDescription(auditCode.getMessage() + username);
             auditTrail.setActionedBy(username);
             auditTrail.setDateActioned(new Timestamp(new Date().getTime()));
-            auditTrail.insert();
+            mongoDBBase.insertDocument(Constants.AUDIT_TRAIL_MONGO_COLLECTION, AuditTrailAdaptor.toDBObject(auditTrail));
         } catch (Exception e) {
             LOGGER.error("Could not create audit event for audit code {} and user {}", auditCode, username);
             LOGGER.error(e.getMessage(), e);
@@ -43,16 +51,15 @@ public class AuditDAOImpl implements AuditDAO {
     }
 
     @Override
-    @Transactional
     public void createEntryAuditEvent(String username, AuditType auditCode, ProductType productType) throws Exception {
         try {
-            AuditTrailProductDB auditTrailProductDB = new AuditTrailProductDB();
-            auditTrailProductDB.setProductType(productType.getValue());
-            auditTrailProductDB.setAuditAction(auditCode.getAuditCode());
-            auditTrailProductDB.setActionedBy(username);
-            auditTrailProductDB.setDateActioned(new Timestamp(new Date().getTime()));
-            auditTrailProductDB.setAuditDescription(auditCode.getMessage() + username);
-            auditTrailProductDB.insert();
+            AuditTrail auditTrail = new AuditTrail();
+            auditTrail.setProductType(productType.getValue());
+            auditTrail.setAuditAction(auditCode.getAuditCode());
+            auditTrail.setActionedBy(username);
+            auditTrail.setDateActioned(new Timestamp(new Date().getTime()));
+            auditTrail.setAuditDescription(auditCode.getMessage() + username);
+            mongoDBBase.insertDocument(Constants.AUDIT_TRAIL_MONGO_COLLECTION, AuditTrailAdaptor.toDBObject(auditTrail));
         } catch (Exception e) {
             LOGGER.error("Could not create audit event for audit code {} and user {}", auditCode, username);
             LOGGER.error(e.getMessage(), e);

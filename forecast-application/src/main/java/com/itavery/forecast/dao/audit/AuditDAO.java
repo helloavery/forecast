@@ -1,7 +1,7 @@
 package com.itavery.forecast.dao.audit;
 
-import com.itavery.forecast.constants.AuditType;
-import com.itavery.forecast.constants.ProductType;
+import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.functional.ProductType;
 
 /**
  * @author Avery Grimes-Farrow

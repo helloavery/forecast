@@ -1,5 +1,7 @@
 package com.itavery.forecast.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,7 +11,10 @@ import java.util.Objects;
  * https://github.com/helloavery
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements Serializable {
+
+    private static final long serialVersionUID = 6145204143031931190L;
 
     private Integer userId;
     private Integer authyId;

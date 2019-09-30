@@ -1,8 +1,8 @@
 package com.itavery.forecast.external;
 
-import com.itavery.forecast.constants.Constants;
+import com.itavery.forecast.Constants;
 import com.itavery.forecast.interaction.client.ClientRestManager;
-import com.itavery.forecast.util.credentials.SecretsRetrieval;
+import com.itavery.forecast.utils.credentials.SecretsRetrieval;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -27,7 +27,7 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
     private ClientRestManager mailgunClient;
 
     @Inject
-    public MailgunEmailVerificationImpl(SecretsRetrieval secretsRetrieval){
+    public void setSecretsRetrieval(SecretsRetrieval secretsRetrieval) {
         this.secretsRetrieval = secretsRetrieval;
     }
 

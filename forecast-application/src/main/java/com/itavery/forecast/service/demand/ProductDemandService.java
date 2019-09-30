@@ -1,8 +1,7 @@
 package com.itavery.forecast.service.demand;
 
-import com.itavery.forecast.exceptions.ServiceException;
-import com.itavery.forecast.product.ProductDemand;
-import com.itavery.forecast.product.ProductDemandDTO;
+import com.itavery.forecast.request.ProductDemandRequest;
+import com.itavery.forecast.utils.exceptions.ServiceException;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -15,13 +14,13 @@ import java.util.List;
 
 public interface ProductDemandService {
 
-    Response addDemandEntry(ProductDemandDTO productDemand, Integer userId) throws ServiceException;
+    Response addDemandEntry(ProductDemandRequest pdRequest, int userId) throws ServiceException;
 
-    Response getDemandEntry(Integer productDemandId) throws ServiceException;
+    Response getDemandEntry(int productDemandId) throws ServiceException;
 
-    Response getUserDemandEntries(Integer userId) throws ServiceException;
+    Response getUserDemandEntries(int userId) throws ServiceException;
 
-    Response updateDemandEntry(List<ProductDemand> productDemandList, Integer userId) throws ServiceException;
+    Response updateDemandEntry(List<ProductDemandRequest> pdRequest, int userId) throws ServiceException;
 
-    Response removeDemandEntry(List<Integer> productDemandId, Integer userId) throws ServiceException;
+    Response removeDemandEntry(List<Integer> productDemandId, int userId) throws ServiceException;
 }

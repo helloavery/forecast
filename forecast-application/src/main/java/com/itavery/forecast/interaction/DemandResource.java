@@ -1,9 +1,10 @@
 package com.itavery.forecast.interaction;
 
-import com.itavery.forecast.product.ProductDemand;
-import com.itavery.forecast.product.ProductDemandDTO;
+import com.itavery.forecast.request.ProductDemandRequest;
 import com.itavery.forecast.service.demand.ProductDemandService;
-import com.itavery.forecast.session.SessionManager;
+import com.itavery.forecast.utils.ResponseBuilder;
+import com.itavery.forecast.utils.session.SessionManager;
+import com.itavery.forecast.utils.validation.ValidProductDemandRequest;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
@@ -28,7 +29,7 @@ public class DemandResource {
     private SessionManager sessionManager;
 
     @Inject
-    public DemandResource(ProductDemandService productDemandService){
+    public void setProductDemandService(ProductDemandService productDemandService) {
         this.productDemandService = productDemandService;
     }
 
@@ -48,26 +49,29 @@ public class DemandResource {
     @Path("/entryDetails")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserDemandEntries(@Context HttpServletRequest request) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productDemandService.getUserDemandEntries(userId);
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productDemandService.getUserDemandEntries(userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 
     @POST
     @Path("/addEntry")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addDemandEntry(@Context HttpServletRequest request, ProductDemandDTO productDemand) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productDemandService.addDemandEntry(productDemand, userId);
+    public Response addDemandEntry(@Context HttpServletRequest request, @ValidProductDemandRequest ProductDemandRequest pdRequest) {
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productDemandService.addDemandEntry(pdRequest, userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 
     @PUT
     @Path("/updateEntries")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateDemandEntry(@Context HttpServletRequest request, List<ProductDemand> productDemandList) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productDemandService.updateDemandEntry(productDemandList, userId);
+    public Response updateDemandEntry(@Context HttpServletRequest request, @ValidProductDemandRequest List<ProductDemandRequest> pdRequest) {
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productDemandService.updateDemandEntry(pdRequest, userId)
+                : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 
     @PUT
@@ -75,7 +79,8 @@ public class DemandResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDemandEntry(@Context HttpServletRequest request, @PathParam("productDemandId") List<Integer> productDemandId) {
-        Integer userId = sessionManager.getLoggedUserId(request);
-        return productDemandService.removeDemandEntry(productDemandId, userId);
+        int userId = sessionManager.getLoggedUserId(request);
+        return userId != 0 ? productDemandService.removeDemandEntry(productDemandId, userId)
+               : ResponseBuilder.createFailureResponse(Response.Status.BAD_REQUEST, "Invalid userId");
     }
 }

@@ -11,6 +11,8 @@ import java.util.Objects;
 
 public class ProductForecast implements Serializable {
 
+    private static final long serialVersionUID = 3411867036773058880L;
+
     private Integer productForecastId;
     private Integer sku;
     private Integer nationalInventory;

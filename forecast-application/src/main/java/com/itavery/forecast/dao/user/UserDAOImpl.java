@@ -1,27 +1,28 @@
 package com.itavery.forecast.dao.user;
 
-import com.itavery.forecast.constants.AccountStatusType;
-import com.itavery.forecast.constants.Constants;
-import com.itavery.forecast.constants.Regions;
-import com.itavery.forecast.constants.RoleValues;
-import com.itavery.forecast.domain.assemblers.UserAssembler;
-import com.itavery.forecast.domain.mithra.annotation.Transactional;
-import com.itavery.forecast.domain.mithra.organization.RolesDBFinder;
-import com.itavery.forecast.domain.mithra.organization.RolesDBList;
-import com.itavery.forecast.domain.mithra.user.AccountStatusDB;
-import com.itavery.forecast.domain.mithra.user.AccountStatusDBFinder;
-import com.itavery.forecast.domain.mithra.user.UsersDB;
-import com.itavery.forecast.domain.mithra.user.UsersDBFinder;
-import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.user.RegistrationDTO;
+import com.itavery.forecast.Constants;
+import com.itavery.forecast.domain.adaptors.AccountStatusAdaptor;
+import com.itavery.forecast.domain.adaptors.UserAdaptor;
+import com.itavery.forecast.domain.mongodb.MongoDBBase;
+import com.itavery.forecast.functional.Regions;
+import com.itavery.forecast.request.RegistrationRequest;
+import com.itavery.forecast.response.UserResponse;
+import com.itavery.forecast.user.AccountStatus;
 import com.itavery.forecast.user.User;
-import com.itavery.forecast.user.UserDTO;
+import com.itavery.forecast.user.UserCreds;
+import com.itavery.forecast.user.UserRole;
+import com.itavery.forecast.utils.exceptions.DAOException;
+import com.mongodb.DBObject;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Avery Grimes-Farrow
@@ -30,103 +31,72 @@ import javax.inject.Inject;
  */
 
 @Repository
-public class UserDAOImpl implements UserDAO, Constants {
+public class UserDAOImpl implements UserDAO {
 
     private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
-    private UserAssembler userAssembler;
+
+    private MongoDBBase mongoDBBase;
 
     @Inject
-    public void setUserAssembler(UserAssembler userAssembler) {
-        this.userAssembler = userAssembler;
+    public void setMongoDBBase(MongoDBBase mongoDBBase) {
+        this.mongoDBBase = mongoDBBase;
     }
 
     @Override
-    @Transactional
-    public UserDTO createUser(RegistrationDTO registrationDTO, Integer authyId) throws DAOException {
-        UserDTO registeredUser = null;
+    public int createUser(RegistrationRequest regRequest, Integer authyId) throws DAOException {
         try {
-            UsersDB userToBeRegistered = userAssembler.covertToDB(registrationDTO);
-            AccountStatusDB userToBeRegisteredAccountStatus = new AccountStatusDB(AccountStatusType.ACTIVE.getCode(), false, false);
-            RolesDBList defaultRoleList = RolesDBFinder.findMany(RolesDBFinder.role().eq(RoleValues.USER.getUserRoleValue()));
-            userToBeRegistered.setAuthyUserId(authyId);
-            userToBeRegistered.setRegion(Regions.AMERICAS.getCode());
-            userToBeRegistered.setAccountStatus(userToBeRegisteredAccountStatus);
-            userToBeRegistered.setRoles(defaultRoleList);
-            registeredUser = userAssembler.covertToDTO(userToBeRegistered);
-            userToBeRegistered.cascadeInsert();
-            LOGGER.info("Successfully inserted new user data in DB for {} : {}", registrationDTO.getUsername(),registrationDTO.getEmail());
-            //////////////Return the generated verificationId///////
+            User userToBeRegistered = UserAdaptor.toUserObject(regRequest, authyId, Regions.AMERICAS);
+            AccountStatus userToBeRegisteredAccountStatus = AccountStatusAdaptor.createNewAccountStatusObject(userToBeRegistered);
+            UserCreds userCreds = UserAdaptor.toNewUserCredsObject(regRequest);
+            UserRole userRole = UserAdaptor.toNewUserRoleObject(userToBeRegistered, com.averygrimes.core.pojo.RoleValues.USER);
+
+            DBObject userDBObject = UserAdaptor.toDBObject(userToBeRegistered);
+            DBObject accountStatusDBObject = UserAdaptor.toDBObject(userToBeRegisteredAccountStatus);
+            DBObject userCredsDBObject = UserAdaptor.toDBObject(userCreds);
+            DBObject userRoleDBObject  = UserAdaptor.toDBObject(userRole);
+
+            Map<String, List<DBObject>> documentsToInsert = new HashMap<>();
+            documentsToInsert.put(Constants.USERS_MONGO_COLLECTION, Arrays.asList(userDBObject));
+            documentsToInsert.put(Constants.ACCOUNT_STATUS_MONGO_COLLECTION, Arrays.asList(accountStatusDBObject));
+            documentsToInsert.put(Constants.USER_CREDS_MONGO_COLLECTION, Arrays.asList(userCredsDBObject));
+            documentsToInsert.put(Constants.USER_ROLES_MONGO_COLLECTION, Arrays.asList(userRoleDBObject));
+            mongoDBBase.bulkInsertDocuments(documentsToInsert);
+            LOGGER.info("Successfully inserted new user data in DB for {} : {}", regRequest.getUsername(),regRequest.getEmail());
+            return userToBeRegistered.getUserId();
         } catch (DAOException e) {
-            LOGGER.error("Could not create user account with username {} and email {}", registrationDTO.getUsername(), registrationDTO.getEmail());
+            LOGGER.error("Could not create user account with username {} and email {}", regRequest.getUsername(), regRequest.getEmail());
             LOGGER.error(e.getMessage(), e);
+            throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, Constants.DAO_USER_NOT_CREATED);
         }
-        return registeredUser;
     }
 
     @Override
-    public UserDTO findUser(Integer userId) throws DAOException {
-        UserDTO userDTO = null;
+    public UserResponse findUser(Integer userId) throws DAOException {
         try {
-            UsersDB user = fetchUserByUserId(userId);
-            if (user != null) {
-                userDTO = userAssembler.covertToDTO(user);
-            } else {
-                LOGGER.error("User not found with username {}", userId);
-            }
+            return mongoDBBase.getDocumentById(UserResponse.class, Constants.USERS_MONGO_COLLECTION, userId);
         } catch (DAOException e) {
             LOGGER.error("Could not find user for username {}", userId);
             LOGGER.error(e.getMessage(), e);
-            throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, Constants.DAO_USER_NOT_FOUND);
+            throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.DAO_USER_NOT_FOUND);
         }
-        return userDTO;
     }
 
     @Override
-    public UserDTO findUser(String email) throws DAOException {
-        UserDTO userDTO = null;
+    public UserResponse findUser(String email) throws DAOException {
         try {
-            UsersDB user = fetchUserByEmail(email);
-            if (user != null) {
-                userDTO = userAssembler.covertToDTO(user);
-            } else {
-                LOGGER.error("User not found with email {}", email);
-            }
+            return mongoDBBase.getDocumentByKey(UserResponse.class, Constants.USERS_MONGO_COLLECTION, "email", email);
         } catch (DAOException e) {
             LOGGER.error("Could not find user for email {}", email);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_NOT_FOUND, Constants.DAO_USER_NOT_FOUND);
         }
-        return userDTO;
     }
 
     @Override
-    @Transactional
     public void updateUser(User user) throws DAOException {
         try {
-            UsersDB userDB = fetchUserByUserId(user.getUserId());
-            if (userDB != null) {
-                if (user.getFirstName() != null) {
-                    userDB.setFirstName(user.getFirstName());
-                }
-                if (user.getLastName() != null) {
-                    userDB.setLastName(user.getLastName());
-                }
-                if (user.getUsername() != null) {
-                    userDB.setUsername(user.getUsername());
-                }
-                if (user.getEmail() != null) {
-                    userDB.setEmail(user.getEmail());
-                }
-                if (user.getCountryCode() != null) {
-                    userDB.setCountryCode(user.getCountryCode());
-                }
-                if (user.getPhoneNumber() != null) {
-                    userDB.setPhoneNumber(user.getPhoneNumber());
-                }
-                if (user.getRegion() != null) {
-                    userDB.setRegion(user.getRegion());
-                }
-            }
+            User oldUser = mongoDBBase.getDocumentById(User.class, Constants.USERS_MONGO_COLLECTION, user.getUserId());
+            mongoDBBase.updateDocument(Constants.USERS_MONGO_COLLECTION, UserAdaptor.toDBObject(oldUser), UserAdaptor.toDBObject(user));
         } catch (DAOException e) {
             LOGGER.error("Could not update user for user {}", user.getUserId());
             LOGGER.error(e.getMessage(), e);
@@ -135,34 +105,19 @@ public class UserDAOImpl implements UserDAO, Constants {
     }
 
     @Override
-    @Transactional
     public String deactivateUser(Integer userId) throws DAOException {
-        String returnMessage;
         try {
             LOGGER.info("Setting deactivation status for user {}", userId);
-            AccountStatusDB accountStatusDB = fetchAccountStatusByUserId(userId);
-            if (accountStatusDB != null) {
-                accountStatusDB.setStatus(AccountStatusType.DEACTIVATED.getCode());
-                accountStatusDB.setActiveAndVerified(false);
-            }
-            returnMessage = USER_SUCCESSFUL_DEACTIVATION;
+            AccountStatus oldAccountStatus = mongoDBBase.getDocumentById(AccountStatus.class, Constants.ACCOUNT_STATUS_MONGO_COLLECTION, userId);
+            AccountStatus updatedAccountStatus = AccountStatusAdaptor.createDeactivationStatusObject(userId);
+            mongoDBBase.updateDocument(Constants.ACCOUNT_STATUS_MONGO_COLLECTION,
+                    AccountStatusAdaptor.toDBObject(oldAccountStatus), AccountStatusAdaptor.toDBObject(updatedAccountStatus));
+            return Constants.USER_SUCCESSFUL_DEACTIVATION;
         } catch (DAOException e) {
             LOGGER.error("Could not deactivate user {}", userId);
             LOGGER.error(e.getMessage(), e);
             throw DAOException.buildResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.DAO_USER_NOT_DEACTIVATED);
         }
-        return returnMessage;
     }
 
-    private UsersDB fetchUserByUserId(Integer userId) {
-        return UsersDBFinder.findOne(UsersDBFinder.userId().eq(userId));
-    }
-
-    private UsersDB fetchUserByEmail(String email) {
-        return UsersDBFinder.findOne(UsersDBFinder.email().toLowerCase().eq(email.toLowerCase()));
-    }
-
-    private AccountStatusDB fetchAccountStatusByUserId(Integer userId) {
-        return AccountStatusDBFinder.findOne(AccountStatusDBFinder.userId().eq(userId));
-    }
 }

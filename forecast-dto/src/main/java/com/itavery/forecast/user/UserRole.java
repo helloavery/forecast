@@ -1,7 +1,9 @@
 package com.itavery.forecast.user;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * @author Avery Grimes-Farrow
@@ -11,49 +13,46 @@ import java.util.Objects;
 
 public class UserRole implements Serializable {
 
-    private Integer userId;
-    private Integer roleId;
+    private static final long serialVersionUID = -7499713954011673839L;
 
-    public UserRole(Integer userId, Integer roleId) {
-        super();
-        this.userId = userId;
-        this.roleId = roleId;
-    }
+    private int userId;
+    private int roleId;
 
-    public Integer getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public Integer getRoleId() {
+    public int getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Integer roleId) {
+    public void setRoleId(int roleId) {
         this.roleId = roleId;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
+        if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (o == null || getClass() != o.getClass()) return false;
 
         UserRole userRole = (UserRole) o;
-        return Objects.equals(userId, userRole.getUserId()) &&
-                Objects.equals(roleId, userRole.getRoleId());
+
+        return new EqualsBuilder()
+                .append(userId, userRole.userId)
+                .append(roleId, userRole.roleId)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, roleId);
+        return new HashCodeBuilder(17, 37)
+                .append(userId)
+                .append(roleId)
+                .toHashCode();
     }
 }

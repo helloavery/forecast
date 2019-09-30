@@ -1,8 +1,8 @@
 package com.itavery.forecast.dao.demand;
 
-import com.itavery.forecast.exceptions.DAOException;
-import com.itavery.forecast.product.ProductDemand;
-import com.itavery.forecast.product.ProductDemandDTO;
+import com.itavery.forecast.request.ProductDemandRequest;
+import com.itavery.forecast.response.ProductDemandResponse;
+import com.itavery.forecast.utils.exceptions.DAOException;
 
 import java.util.List;
 
@@ -14,13 +14,13 @@ import java.util.List;
 
 public interface ProductDemandDAO {
 
-    String addDemandEntry(Integer userId, ProductDemandDTO productDemandDTO) throws DAOException;
+    String addDemandEntry(int userId, ProductDemandRequest pdRequest) throws DAOException;
 
-    ProductDemandDTO getDemandEntry(Integer productDemandId) throws DAOException;
+    ProductDemandResponse getDemandEntry(int productDemandId) throws DAOException;
 
-    List<ProductDemandDTO> getUserDemandEntries(Integer userId) throws DAOException;
+    List<ProductDemandResponse> getUserDemandEntries(int userId) throws DAOException;
 
-    void updateDemandEntry(List<ProductDemand> productDemandList, Integer userId) throws DAOException;
+    void updateDemandEntry(List<ProductDemandRequest> pdRequest, int userId) throws DAOException;
 
     String removeDemandEntry(List<Integer> productDemandId) throws DAOException;
 }
