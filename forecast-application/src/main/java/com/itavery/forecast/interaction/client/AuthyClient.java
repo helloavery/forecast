@@ -2,6 +2,7 @@ package com.itavery.forecast.interaction.client;
 
 import com.itavery.forecast.response.AuthyResponse;
 
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType;
  */
 
 @Path("/protected/json")
+@Named
 public interface AuthyClient {
 
     @GET

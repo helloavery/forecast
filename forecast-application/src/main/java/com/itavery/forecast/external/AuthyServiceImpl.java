@@ -6,7 +6,7 @@ import com.authy.api.Token;
 import com.authy.api.User;
 import com.itavery.forecast.Constants;
 import com.itavery.forecast.functional.AuthyOtpMethod;
-import com.itavery.forecast.interaction.client.ClientRestManager;
+import com.itavery.forecast.interaction.client.AuthyClient;
 import com.itavery.forecast.response.AuthyResponse;
 import com.itavery.forecast.response.UserResponse;
 import com.twilio.http.TwilioRestClient;
@@ -33,7 +33,7 @@ public class AuthyServiceImpl implements AuthyService{
     private static final Logger LOGGER = LogManager.getLogger(AuthyServiceImpl.class);
     private AuthyApiClient authyApiClient;
     private TwilioRestClient twilioRestClient;
-    private ClientRestManager authyClient;
+    private AuthyClient authyClient;
 
     @Inject
     public void setAuthyApiClient(AuthyApiClient authyApiClient) {
@@ -46,7 +46,7 @@ public class AuthyServiceImpl implements AuthyService{
     }
 
     @Inject
-    public void setAuthyClient(ClientRestManager authyClient) {
+    public void setAuthyClient(AuthyClient authyClient) {
         this.authyClient = authyClient;
     }
 

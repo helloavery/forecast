@@ -1,7 +1,7 @@
 package com.itavery.forecast.external;
 
 import com.itavery.forecast.Constants;
-import com.itavery.forecast.interaction.client.ClientRestManager;
+import com.itavery.forecast.interaction.client.MailgunClient;
 import com.itavery.forecast.utils.credentials.SecretsRetrieval;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -24,7 +24,7 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
 
     private static final Logger LOGGER = LogManager.getLogger(MailgunEmailVerificationImpl.class);
     private SecretsRetrieval secretsRetrieval;
-    private ClientRestManager mailgunClient;
+    private MailgunClient mailgunClient;
 
     @Inject
     public void setSecretsRetrieval(SecretsRetrieval secretsRetrieval) {
@@ -32,7 +32,7 @@ public class MailgunEmailVerificationImpl implements MailgunEmailVerification {
     }
 
     @Inject
-    public void setMailgunClient(ClientRestManager mailgunClient) {
+    public void setMailgunClient(MailgunClient mailgunClient) {
         this.mailgunClient = mailgunClient;
     }
 

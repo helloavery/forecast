@@ -3,6 +3,7 @@ package com.itavery.forecast.interaction.client;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.MediaType;
  * https://github.com/helloavery
  */
 
+@Named
 public interface MailgunClient {
 
     @GET
