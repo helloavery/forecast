@@ -1,18 +1,18 @@
 package com.itavery.forecast.domain.mongodb;
 
 import com.mongodb.DBObject;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Named;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Avery Grimes-Farrow
- * Created on: 9/28/19
+ * Created on: 10/7/19
  * https://github.com/helloavery
  */
 
-@Component
+@Named
 public class MongoDBBase extends AbstractMongoDB {
 
     public <T> T getDocumentById(Class<T> clazz, String collection, Object idValue){

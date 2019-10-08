@@ -1,18 +1,12 @@
 package com.itavery.forecast.cache;
 
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.core.HazelcastInstance;
-
-import javax.annotation.PostConstruct;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author Avery Grimes-Farrow
  * Created on: 9/24/19
  * https://github.com/helloavery
  */
 
-public class UserCacheBase extends AbstractCache {
+/*public class UserCacheBase extends AbstractCache {
 
     private Integer ttlSeconds;
 
@@ -44,4 +38,4 @@ public class UserCacheBase extends AbstractCache {
         super.putItemInCache(key, value, ttlSeconds.longValue(), TimeUnit.SECONDS);
     }
 
-}
+}*/

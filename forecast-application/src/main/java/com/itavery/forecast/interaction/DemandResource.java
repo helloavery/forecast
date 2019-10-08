@@ -1,9 +1,9 @@
 package com.itavery.forecast.interaction;
 
+import com.averygrimes.nexus.util.session.SessionManager;
 import com.itavery.forecast.request.ProductDemandRequest;
 import com.itavery.forecast.service.demand.ProductDemandService;
 import com.itavery.forecast.utils.ResponseBuilder;
-import com.itavery.forecast.utils.session.SessionManager;
 import com.itavery.forecast.utils.validation.ValidProductDemandRequest;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,8 +1,8 @@
 package com.itavery.forecast.utils.credentials;
 
-import com.averygrimes.core.credentials.CoreSecretsRetrieval;
-import com.averygrimes.core.pojo.S3BucketMap;
-import com.averygrimes.core.pojo.SecretCategory;
+import com.averygrimes.nexus.credentials.NexusSecretsRetrieval;
+import com.averygrimes.nexus.pojo.S3BucketMap;
+import com.averygrimes.nexus.pojo.SecretCategory;
 import com.itavery.forecast.config.ProgramArguments;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +25,7 @@ public class SecretsRetrieval {
 
     private static final Logger LOGGER = LogManager.getLogger(SecretsRetrieval.class);
     private ProgramArguments programArguments;
-    private CoreSecretsRetrieval coreSecretsRetrieval;
+    private NexusSecretsRetrieval nexusSecretsRetrieval;
 
     @Inject
     public void setProgramArguments(ProgramArguments programArguments) {
@@ -33,8 +33,8 @@ public class SecretsRetrieval {
     }
 
     @Inject
-    public void setCoreSecretsRetrieval(CoreSecretsRetrieval coreSecretsRetrieval) {
-        this.coreSecretsRetrieval = coreSecretsRetrieval;
+    public void setNexusSecretsRetrieval(NexusSecretsRetrieval nexusSecretsRetrieval) {
+        this.nexusSecretsRetrieval = nexusSecretsRetrieval;
     }
 
     private static String mailgunApiKey;
@@ -51,7 +51,7 @@ public class SecretsRetrieval {
         secretCategoryMap.put(SecretCategory.AUTHY, new S3BucketMap(programArguments.getS3bucket(),programArguments.getS3bucketObjectAuthy()));
         secretCategoryMap.put(SecretCategory.TWILIO, new S3BucketMap(programArguments.getS3bucket(),programArguments.getS3bucketObjectTwilio()));
         secretCategoryMap.put(SecretCategory.KEYRING, new S3BucketMap(programArguments.getS3bucket(),programArguments.getS3bucketObjectKeyring()));
-        Map<SecretCategory, String> secretsMap = coreSecretsRetrieval.getApplicationSecrets(secretCategoryMap);
+        Map<SecretCategory, String> secretsMap = nexusSecretsRetrieval.getApplicationSecrets(secretCategoryMap);
         mailgunApiKey = secretsMap.get(SecretCategory.MAILGUN);
         authyApiKey = secretsMap.get(SecretCategory.AUTHY);
         twilioSid = getKeyValuePair(secretsMap.get(SecretCategory.TWILIO), KeyValue.KEY);

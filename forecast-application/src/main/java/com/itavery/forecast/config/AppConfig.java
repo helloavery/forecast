@@ -7,14 +7,7 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
 
 /**
  * @author Avery Grimes-Farrow
@@ -23,7 +16,6 @@ import java.util.Arrays;
  */
 
 @Configuration
-@Component
 public class AppConfig {
 
     @Bean
@@ -45,14 +37,5 @@ public class AppConfig {
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         return velocityEngine;
-    }
-
-    @Bean
-    public RestTemplate restTemplate(){
-        RestTemplate restTemplate = new RestTemplate(new SimpleClientHttpRequestFactory());
-        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-        messageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN));
-        restTemplate.getMessageConverters().add(messageConverter);
-        return restTemplate;
     }
 }

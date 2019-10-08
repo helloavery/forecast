@@ -1,6 +1,6 @@
 package com.itavery.forecast.interaction;
 
-import com.averygrimes.core.pojo.EmailNotificationRequest;
+import com.averygrimes.nexus.pojo.EmailNotificationRequest;
 import com.itavery.forecast.kafka.KafkaMessageSender;
 import org.springframework.web.bind.annotation.RestController;
 

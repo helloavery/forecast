@@ -9,7 +9,8 @@ package com.itavery.forecast.config;
 public class ProgramArguments {
 
     private String instance;
-    private String dataSource;
+    private String datasourceHost;
+    private int datasourcePort;
     private String schema;
     private String s3bucket;
     private String s3bucketObjectKeyring;
@@ -19,8 +20,8 @@ public class ProgramArguments {
     private String s3bucketObjectUploadFile;
     private String showSql = "true";
     private String sessionContextClass = "thread";
-    private String authyClientVersion;
-    private String mailgunClientVersion;
+    private String authyClientEndpoint;
+    private String mailgunClientEndpoint;
     private String kafkaBootstrapAddress;
 
     public String getInstance() {
@@ -31,12 +32,20 @@ public class ProgramArguments {
         this.instance = instance;
     }
 
-    public String getDataSource() {
-        return dataSource;
+    public String getDatasourceHost() {
+        return datasourceHost;
     }
 
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
+    public void setDatasourceHost(String datasourceHost) {
+        this.datasourceHost = datasourceHost;
+    }
+
+    public int getDatasourcePort() {
+        return datasourcePort;
+    }
+
+    public void setDatasourcePort(int datasourcePort) {
+        this.datasourcePort = datasourcePort;
     }
 
     public String getSchema() {
@@ -111,20 +120,20 @@ public class ProgramArguments {
         this.sessionContextClass = sessionContextClass;
     }
 
-    public String getAuthyClientVersion() {
-        return authyClientVersion;
+    public String getAuthyClientEndpoint() {
+        return authyClientEndpoint;
     }
 
-    public void setAuthyClientVersion(String authyClientVersion) {
-        this.authyClientVersion = authyClientVersion;
+    public void setAuthyClientEndpoint(String authyClientEndpoint) {
+        this.authyClientEndpoint = authyClientEndpoint;
     }
 
-    public String getMailgunClientVersion() {
-        return mailgunClientVersion;
+    public String getMailgunClientEndpoint() {
+        return mailgunClientEndpoint;
     }
 
-    public void setMailgunClientVersion(String mailgunClientVersion) {
-        this.mailgunClientVersion = mailgunClientVersion;
+    public void setMailgunClientEndpoint(String mailgunClientEndpoint) {
+        this.mailgunClientEndpoint = mailgunClientEndpoint;
     }
 
     public String getKafkaBootstrapAddress() {

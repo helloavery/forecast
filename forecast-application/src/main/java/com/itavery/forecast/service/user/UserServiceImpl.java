@@ -1,21 +1,21 @@
 package com.itavery.forecast.service.user;
 
-import com.averygrimes.core.pojo.EmailNotificationRequest;
+import com.averygrimes.nexus.pojo.EmailNotificationRequest;
+import com.averygrimes.nexus.util.session.SessionManager;
 import com.itavery.forecast.Constants;
 import com.itavery.forecast.dao.user.UserDAO;
 import com.itavery.forecast.external.AuthyService;
 import com.itavery.forecast.functional.AuditType;
+import com.itavery.forecast.kafka.KafkaMessageSender;
 import com.itavery.forecast.request.LoginRequest;
 import com.itavery.forecast.request.RegistrationRequest;
 import com.itavery.forecast.response.UserResponse;
 import com.itavery.forecast.service.audit.AuditService;
-import com.itavery.forecast.kafka.KafkaMessageSender;
 import com.itavery.forecast.service.verification.VerificationService;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.utils.ResponseBuilder;
 import com.itavery.forecast.utils.UUIDUtils;
 import com.itavery.forecast.utils.exceptions.ServiceException;
-import com.itavery.forecast.utils.session.SessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;

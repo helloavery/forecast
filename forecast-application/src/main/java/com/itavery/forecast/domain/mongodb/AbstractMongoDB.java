@@ -1,11 +1,11 @@
 package com.itavery.forecast.domain.mongodb;
 
+import com.averygrimes.nexus.pojo.Constants;
+import com.averygrimes.nexus.util.exceptions.MongoDBException;
 import com.google.gson.Gson;
-import com.itavery.forecast.Constants;
-import com.itavery.forecast.domain.util.DataVersioningUtil;
 import com.itavery.forecast.config.ProgramArguments;
+import com.itavery.forecast.domain.util.DataVersioningUtil;
 import com.itavery.forecast.utils.credentials.SecretsRetrieval;
-import com.itavery.forecast.utils.exceptions.MongoDBException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * @author Avery Grimes-Farrow
- * Created on: 9/28/19
+ * Created on: 10/7/19
  * https://github.com/helloavery
  */
 
@@ -45,16 +45,6 @@ public abstract class AbstractMongoDB {
     private MongoClient mongoClient;
     private DB mongoDatabase;
 
-    @Inject
-    public void setProgramArguments(ProgramArguments programArguments) {
-        this.programArguments = programArguments;
-    }
-
-    @Inject
-    public void setSecretsRetrieval(SecretsRetrieval secretsRetrieval) {
-        this.secretsRetrieval = secretsRetrieval;
-    }
-
     @PostConstruct
     public void init(){
         if(this.mongoClient == null){
@@ -63,11 +53,12 @@ public abstract class AbstractMongoDB {
     }
 
     private MongoClient setupMongoClient(){
-        String clientURL = programArguments.getDataSource();
+        String host = programArguments.getDatasourceHost();
+        int port =  programArguments.getDatasourcePort();
         String databaseName = programArguments.getSchema();
         MongoCredential credential = setMongoCredentials(databaseName);
         try{
-            return new MongoClient(new ServerAddress(clientURL), Arrays.asList(credential));
+            return new MongoClient(new ServerAddress(host,port), Arrays.asList(credential));
         }
         catch(UnknownHostException e){
             throw new MongoDBException("Error creating new MongoClient. Caught error is " + e.getMessage());
@@ -75,20 +66,13 @@ public abstract class AbstractMongoDB {
     }
 
     private MongoCredential setMongoCredentials(String database){
-        String username = getDBUsername();
-        String pwd = getDBPassword();
+        String username = secretsRetrieval.getKeyringKey();
+        String pwd = secretsRetrieval.getKeyringValue();
         if(username == null|| pwd == null){
             LOGGER.error("Username and/or password while setting up credentials came back null");
             throw new MongoDBException("Username and/or password while setting up credentials came back null");
         }
         return MongoCredential.createCredential(username, database, pwd.toCharArray());
-    }
-
-    private String getDBUsername(){
-        return secretsRetrieval.getKeyringKey();
-    }
-    private String getDBPassword(){
-        return secretsRetrieval.getKeyringValue();
     }
 
     private DB getMongoDatabase() {
@@ -175,5 +159,15 @@ public abstract class AbstractMongoDB {
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.put("_id", idValue);
         dbCollection.remove(searchQuery);
+    }
+
+    @Inject
+    public void setProgramArguments(ProgramArguments programArguments) {
+        this.programArguments = programArguments;
+    }
+
+    @Inject
+    public void setSecretsRetrieval(SecretsRetrieval secretsRetrieval) {
+        this.secretsRetrieval = secretsRetrieval;
     }
 }

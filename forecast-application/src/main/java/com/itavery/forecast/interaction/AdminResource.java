@@ -1,8 +1,9 @@
 package com.itavery.forecast.interaction;
 
-import com.averygrimes.core.pojo.RoleValues;
-import com.averygrimes.core.service.S3GatewayService;
-import com.averygrimes.core.util.annotation.EntitlementPolicy;
+
+import com.averygrimes.nexus.pojo.RoleValues;
+import com.averygrimes.nexus.service.S3GatewayService;
+import com.averygrimes.nexus.util.annotation.EntitlementPolicy;
 import com.itavery.forecast.utils.FileReader;
 import org.springframework.stereotype.Component;
 

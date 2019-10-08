@@ -1,6 +1,6 @@
 package com.itavery.forecast.domain.util;
 
-import com.itavery.forecast.history.BaseHistory;
+import com.averygrimes.nexus.pojo.BaseHistory;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.MapUtils;
@@ -17,7 +17,7 @@ import java.util.TimeZone;
 
 /**
  * @author Avery Grimes-Farrow
- * Created on: 9/28/19
+ * Created on: 10/7/19
  * https://github.com/helloavery
  */
 
@@ -65,6 +65,4 @@ public class DataVersioningUtil {
     private static DBObject toDBObject(BaseHistory baseHistory){
         return new BasicDBObject().append("changes", baseHistory);
     }
-
-
 }

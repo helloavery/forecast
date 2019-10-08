@@ -1,6 +1,6 @@
 package com.itavery.forecast.domain.adaptors;
 
-import com.averygrimes.core.pojo.RoleValues;
+import com.averygrimes.nexus.pojo.RoleValues;
 import com.itavery.forecast.functional.Regions;
 import com.itavery.forecast.request.RegistrationRequest;
 import com.itavery.forecast.user.AccountStatus;

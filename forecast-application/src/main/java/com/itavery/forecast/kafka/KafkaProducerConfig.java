@@ -1,6 +1,5 @@
 package com.itavery.forecast.kafka;
 
-import com.itavery.forecast.config.ProgramArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,21 +15,15 @@ import javax.inject.Inject;
 @Configuration
 public class KafkaProducerConfig {
 
-    private com.averygrimes.core.kafka.KafkaProducerConfig coreProducerConfig;
-    private ProgramArguments programArguments;
+    private com.averygrimes.nexus.kafka.KafkaProducerConfig nexusProducerConfig;
 
     @Inject
-    public void setCoreProducerConfig(com.averygrimes.core.kafka.KafkaProducerConfig coreProducerConfig) {
-        this.coreProducerConfig = coreProducerConfig;
-    }
-
-    @Inject
-    public void setProgramArguments(ProgramArguments programArguments) {
-        this.programArguments = programArguments;
+    public void setCoreProducerConfig(com.averygrimes.nexus.kafka.KafkaProducerConfig nexusProducerConfig) {
+        this.nexusProducerConfig = nexusProducerConfig;
     }
 
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate(){
-        return coreProducerConfig.buildKafkaTemplate(programArguments.getKafkaBootstrapAddress());
+        return nexusProducerConfig.buildKafkaTemplate();
     }
 }

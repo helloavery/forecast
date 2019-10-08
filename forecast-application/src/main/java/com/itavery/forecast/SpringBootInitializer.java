@@ -23,8 +23,9 @@ public class SpringBootInitializer implements ApplicationRunner {
 
     private static final Logger LOGGER = LogManager.getLogger(SpringBootInitializer.class);
 
-    private final List<String> startupParams = Arrays.asList("datasource", "schema", "s3gatewayendpoint", "s3bucket", "s3bucketObjectKeyring",
-            "s3bucketObjectMailgun", "s3bucketObjectAuthy", "s3bucketObjectTwilio", "kafkaBootstrapAddress");
+    private final List<String> startupParams = Arrays.asList("datasourcehost", "datasourceport", "schema", "s3bucket", "s3bucketObjectKeyring",
+            "s3bucketObjectMailgun", "s3bucketObjectAuthy", "s3bucketObjectTwilio", "authyClientEndpoint", "mailgunClientEndpoint",
+            "kafkaBootstrapAddress", "nexus.kafka.env", "discovery.environment");
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootInitializer.class, args);

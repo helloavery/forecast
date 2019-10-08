@@ -1,6 +1,6 @@
 package com.itavery.forecast.kafka;
 
-import com.averygrimes.core.pojo.EmailNotificationRequest;
+import com.averygrimes.nexus.pojo.EmailNotificationRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ public class KafkaMessageSender {
 
     private static final Logger LOGGER = LogManager.getLogger(KafkaMessageSender.class);
 
-    private com.averygrimes.core.kafka.KafkaMessageSender kafkaMessageSender;
+    private com.averygrimes.nexus.kafka.KafkaMessageSender kafkaMessageSender;
 
     @Inject
-    public void setKafkaMessageSender(com.averygrimes.core.kafka.KafkaMessageSender kafkaMessageSender) {
+    public void setKafkaMessageSender(com.averygrimes.nexus.kafka.KafkaMessageSender kafkaMessageSender) {
         this.kafkaMessageSender = kafkaMessageSender;
     }
 

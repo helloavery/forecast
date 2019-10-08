@@ -2,9 +2,6 @@ spring.thymeleaf.enabled: false
 
 #spring.datasource.validationQuery: SELECT 1
 
-#spring.jpa.hibernate.naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
-
-
 # ==============================================================
 # = Spring Security / Queries for AuthenticationManagerBuilder
 # ==============================================================
@@ -22,20 +19,11 @@ zuul:
 spring.main.allow-bean-definition-overriding: true
 
 logging.level.com.forecast.itavery: INFO
-logging.level.org.hibernate: ERROR
-logging.level.org.postgres: ERROR
 logging.file: logs/forecasterLog.log
 
 spring:
   batch:
     job:
       enabled: false
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-server:
-  port: 9000
 
 

@@ -1,11 +1,11 @@
 package com.itavery.forecast.interaction;
 
+import com.averygrimes.nexus.util.session.SessionManager;
 import com.itavery.forecast.request.LoginRequest;
 import com.itavery.forecast.request.RegistrationRequest;
 import com.itavery.forecast.service.user.UserService;
 import com.itavery.forecast.user.User;
 import com.itavery.forecast.utils.ResponseBuilder;
-import com.itavery.forecast.utils.session.SessionManager;
 import com.itavery.forecast.utils.validation.ValidUserRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;

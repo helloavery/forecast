@@ -1,5 +1,6 @@
 package com.itavery.forecast.dao.user;
 
+import com.averygrimes.nexus.pojo.RoleValues;
 import com.itavery.forecast.Constants;
 import com.itavery.forecast.domain.adaptors.AccountStatusAdaptor;
 import com.itavery.forecast.domain.adaptors.UserAdaptor;
@@ -48,7 +49,7 @@ public class UserDAOImpl implements UserDAO {
             User userToBeRegistered = UserAdaptor.toUserObject(regRequest, authyId, Regions.AMERICAS);
             AccountStatus userToBeRegisteredAccountStatus = AccountStatusAdaptor.createNewAccountStatusObject(userToBeRegistered);
             UserCreds userCreds = UserAdaptor.toNewUserCredsObject(regRequest);
-            UserRole userRole = UserAdaptor.toNewUserRoleObject(userToBeRegistered, com.averygrimes.core.pojo.RoleValues.USER);
+            UserRole userRole = UserAdaptor.toNewUserRoleObject(userToBeRegistered, RoleValues.USER);
 
             DBObject userDBObject = UserAdaptor.toDBObject(userToBeRegistered);
             DBObject accountStatusDBObject = UserAdaptor.toDBObject(userToBeRegisteredAccountStatus);
