@@ -42,7 +42,7 @@
         <mailgun-sargue-version>1.9.0</mailgun-sargue-version>
         <mockito-version>3.0.0</mockito-version>
 
-        <spring-boot-version>2.1.9.RELEASE</spring-boot-version>
+        <spring-boot-version>2.5.12</spring-boot-version>
         <spring-cloud-version>2.1.3.RELEASE</spring-cloud-version>
         <twilio-version>7.32.0</twilio-version>
         <unirest-version>1.4.9</unirest-version>
